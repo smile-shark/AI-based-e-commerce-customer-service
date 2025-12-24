@@ -1,52 +1,66 @@
 # 企业级电商AI智能客服系统
+## 数据库设计
+```dbml
+Table commercial_tenant [note:'商户表']{
+  id int [pk, increment, note:'商户id']
+  name varchar(30) [note:'商户名称']
+  account char(20)
+  password char(30)
+}
 
-> #### 功能要求
+Table user [note:'客户表']{
+  id int [pk, increment, note:'客户id']
+  name varchar(30) [note:'客户名称']
+  account char(20)
+  password char(30)
+}
 
-* 商品查询 Tool（对接模拟电商 API）
-* 知识库 RAG（1000+ 商品政策与常见问题文档）
-* 客服角色设定 + 专业提示词模板
-* 多用户会话 + Redis短期记忆 + MySQL对话长期记忆
-* 敏感词 + 情绪感应 + 自动转人工
-* 前端聊天界面（Vue3 + SSE 流式）
+Table goods [note:'商品表']{
+  id int [pk, increment, note:'商品id自增列']
+  name varchar(30) [note:'商品名称']
+  ct_id int [ref:> commercial_tenant.id,note:'关联的商户']
+}
 
-> #### 数据库设计
+Table goods_document [note:'商品对应的文档']{
+  id int [pk, increment, note:'文档id，用户向量检索时筛选']
+  name varchar(100) [note:'文档的名称，用于查看对应商品下面有哪些文档']
+  goods_id int [ref:> goods.id,note:'关联的商品']
+}
 
-1. 需要有商品查询所以需要一个商品表（商品表）
-2. 向量数据库中需要对每个不同的商品的说明文档进行隔离（商品说明向量库）
-3. 客服角色框架设定加角色提示词动态调整（客服设定表）
-4. 对话记忆表，每条记忆关联一个会话（对话记忆表）
-5. 一个客户关联多个会话，每个会话记录一个会话ID
-6. 用户表，不同用户之间的对话需要进行隔离
-7. 敏感词表，对敏感词进行过滤
+Table role [note:'角色设定表，用于动态控制客户角色的细微调整']{
+  id int [pk, increment, note:'角色的id']
+  role_name varchar [note:'角色名称 <roleName>']
+  role_description text [note:'角色描述 <roleDescription>']
+  greeting_message text [note:'问候语 <greetingMessage>']
+  problem_solving_approach text [note:'解决问题的方法 <problemSolvingApproach>']
+  communication_style varchar [note:'沟通风格 <communicationStyle>']
+  response_tone varchar [note:'回复语调 <responseTone>']
+  product_knowledge_level varchar [note:'产品知识水平 <productKnowledgeLevel>']
+  emotional_intelligence varchar [note:'情商表现 <emotionalIntelligence>']
+  escalation_criteria text [note:'升级处理标准 <escalationCriteria>']
+  closing_message text [note:'结束语 <closingMessage>']
+  created_at datetime [note:'创建时间']
+  updated_at datetime [note:'更新时间']
+  
+  ct_id int [ref:> commercial_tenant.id,note:'关联的商户，每个商户有一个客户的角色']
+}
 
-> #### 涉及技术及步骤
-商品查询使用MySQL+MyBatis-Plus属于常备知识不用细讲
+Table session [note:'会话表，一个商家和客户的会话id']{
+  id int [pk, increment, note:'会话id']
+  ct_id int [ref:> commercial_tenant.id,note:'关联的商户']
+  user_id int [ref:>user.id,note:'关联的客户']
+}
 
-简述：检索增强生成（Retrieval-augmented Generation）
-对于基础大模型来说，他只具备通用信息，其所属的知识停留在训练结束之前，对于之后的事情一概不知，虽然可以通过ToolCalling或System的提示词获取一些新的信息，但是这种场景只适用于少量的知识，大量领域的信息还是需要外接一个知识库
+Table session_log [note:'对话记录表']{
+  id int [pk, increment, note:'记录的id']
+  content text [note:'对话的内容']
+  type enum('USER', 'ASSISTANT', 'SYSTEM', 'TOOL','COMMERCIAL_TENANT') [note:'对话人身份']
+  timestamp datetime [default: `now()`,note:'记录创建的时间']
+  session_id int [ref:> session.id,note:'关联的会话']
+}
 
-**文本向量化步骤：**
-文档->拆分->向量模型->向量数据库
-1. 多文档格式处理(pdf/world/md/txt...)
-2. 拆分颗粒度大小的优缺点
-3. 向量模型中维度不同的影响
-4. Milvus向量数据库选择的优缺点
-
-**提示词模板：**
-
-* 使用PromptTemplate外部引入模板框架+数据库查询动态角色设定
-* 提示词设计技巧+结构化设计
-
-**用户会话隔离+记忆：**
-1. 多用户之间的会话进行隔离，手动使用拦截器进行筛查
-2. 短期Redis记忆设定会话轮数上限和过期时间
-3. 使用MySQL对对话内容（包含人工、AI客户+客户对话）进行长期保存
-
-**词汇检测：**
-1. 检测到一些特定的词汇或情绪表达自动转人工服务
-2. 配置关键词拦截器对敏感问题回避
-3. 使用websocket技术实现人工服务实时通信
-
-**前端**
-1. 简单流式接收讲解
-2. 简单websocket连接讲解
+Table sensitive_words [note:'敏感词表']{
+  id int [pk, increment]
+  content char(40) 
+}
+```
