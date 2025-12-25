@@ -14,7 +14,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `goods` (
   `id` int PRIMARY KEY AUTO_INCREMENT COMMENT '商品id自增列',
-  `name` varchar(30) COMMENT '商品名称',
+  `name` varchar(200) COMMENT '商品名称',
   `ct_id` int COMMENT '关联的商户'
 );
 

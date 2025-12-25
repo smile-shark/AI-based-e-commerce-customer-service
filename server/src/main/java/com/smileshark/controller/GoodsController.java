@@ -8,6 +8,8 @@ import com.smileshark.service.GoodsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+
 @RestController
 @RequestMapping("/goods")
 @RequiredArgsConstructor

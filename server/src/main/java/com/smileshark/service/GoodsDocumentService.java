@@ -11,4 +11,6 @@ public interface GoodsDocumentService extends IService<GoodsDocument> {
     List<GoodsDocument> getListByGoodsId(Integer id);
 
     Result<?> uploadGoodsDocument(MultipartFile file, Integer goodsId);
+
+    Result<?> delete(Integer id);
 }

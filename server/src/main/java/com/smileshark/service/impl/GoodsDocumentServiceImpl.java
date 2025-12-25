@@ -1,6 +1,7 @@
 package com.smileshark.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.smileshark.code.ResultCode;
 import com.smileshark.common.Result;
 import com.smileshark.entity.GoodsDocument;
 import com.smileshark.mapper.GoodsDocumentMapper;
@@ -55,5 +56,16 @@ public class GoodsDocumentServiceImpl extends ServiceImpl<GoodsDocumentMapper, G
         // TODO 使用 Milvus 进行向量存储
 
         return null;
+    }
+
+    @Override
+    @Transactional
+    public Result<?> delete(Integer id) {
+        if (!removeById(id)) {
+            return Result.error(ResultCode.DELETE_ERROR);
+        }
+        // TODO 根据上传的id删除向量数据库中的数据
+
+        return Result.success(ResultCode.DELETE_SUCCESS);
     }
 }

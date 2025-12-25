@@ -3,10 +3,7 @@ package com.smileshark.controller;
 import com.smileshark.common.Result;
 import com.smileshark.service.GoodsDocumentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -14,9 +11,25 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class GoodsDocumentController {
     private final GoodsDocumentService goodsDocumentService;
+
+    /**
+     * 文档上传
+     * @param file 文档
+     * @param goodsId 商品id
+     * @return 上传结果
+     */
     @PostMapping("/upload")
     public Result<?> upload(@RequestBody MultipartFile file, Integer goodsId) {
-        // 这里调用service方法处理上传逻辑，具体实现由用户完成
         return goodsDocumentService.uploadGoodsDocument(file, goodsId);
+    }
+
+    /**
+     * 删除 文档
+     * @param id 文档id
+     * @return 删除结果
+     */
+    @DeleteMapping("/delete")
+    public Result<?> delete(@RequestParam Integer id) {
+        return goodsDocumentService.delete(id);
     }
 }

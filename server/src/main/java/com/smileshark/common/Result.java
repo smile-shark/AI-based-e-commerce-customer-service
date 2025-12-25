@@ -37,4 +37,8 @@ public class Result<T> {
                 .message(resultCode.getMessage())
                 .build();
     }
+    public Result<T> setMessage(String message){
+        this.message = message;
+        return this;
+    }
 }
