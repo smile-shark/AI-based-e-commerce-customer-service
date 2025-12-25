@@ -4,14 +4,14 @@
 Table commercial_tenant [note:'商户表']{
   id int [pk, increment, note:'商户id']
   name varchar(30) [note:'商户名称']
-  account char(20)
+  account char(20) [unique]
   password char(30)
 }
 
 Table user [note:'客户表']{
   id int [pk, increment, note:'客户id']
   name varchar(30) [note:'客户名称']
-  account char(20)
+  account char(20) [unique]
   password char(30)
 }
 
@@ -49,6 +49,7 @@ Table session [note:'会话表，一个商家和客户的会话id']{
   id int [pk, increment, note:'会话id']
   ct_id int [ref:> commercial_tenant.id,note:'关联的商户']
   user_id int [ref:>user.id,note:'关联的客户']
+  goods_id int [ref:> goods.id,note:'关联的商品，RAG会根据这个取查询对应商品的知识']
 }
 
 Table session_log [note:'对话记录表']{

@@ -1,14 +1,14 @@
 CREATE TABLE `commercial_tenant` (
   `id` int PRIMARY KEY AUTO_INCREMENT COMMENT '商户id',
   `name` varchar(30) COMMENT '商户名称',
-  `account` char(20),
+  `account` char(20) unique ,
   `password` char(30)
 );
 
 CREATE TABLE `user` (
   `id` int PRIMARY KEY AUTO_INCREMENT COMMENT '客户id',
   `name` varchar(30) COMMENT '客户名称',
-  `account` char(20),
+  `account` char(20) unique ,
   `password` char(30)
 );
 

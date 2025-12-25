@@ -22,7 +22,6 @@ public class Session {
      * 会话id
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**

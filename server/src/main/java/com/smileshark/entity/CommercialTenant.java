@@ -22,7 +22,6 @@ public class CommercialTenant {
      * 商户id
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**
@@ -36,4 +35,7 @@ public class CommercialTenant {
     
     @TableField("password")
     private String password;
+    public void clearPassword() {
+        this.password = null;
+    }
 }

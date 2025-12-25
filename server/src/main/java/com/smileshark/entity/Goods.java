@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 商品实体类
  */
@@ -22,7 +24,6 @@ public class Goods {
      * 商品id自增列
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**
@@ -36,4 +37,7 @@ public class Goods {
      */
     @TableField("ct_id")
     private Integer ctId;
+
+    @TableField(exist = false)
+    private List<GoodsDocument> documents;
 }

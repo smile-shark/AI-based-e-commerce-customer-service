@@ -24,7 +24,6 @@ public class Role {
      * 角色的id
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**

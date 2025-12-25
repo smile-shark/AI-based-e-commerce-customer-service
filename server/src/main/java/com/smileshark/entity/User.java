@@ -22,18 +22,21 @@ public class User {
      * 客户id
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
-    
+
     /**
      * 客户名称
      */
     @TableField("name")
     private String name;
-    
+
     @TableField("account")
     private String account;
-    
+
     @TableField("password")
     private String password;
+
+    public void clearPassword() {
+        this.password = null;
+    }
 }

@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @TableName("sensitive_words")
 public class SensitiveWords {
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     @TableField("content")

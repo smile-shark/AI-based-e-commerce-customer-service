@@ -32,7 +32,6 @@ public class SessionLog {
      * 记录的id
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**

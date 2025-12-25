@@ -22,7 +22,6 @@ public class GoodsDocument {
      * 文档id，用户向量检索时筛选
      */
     @TableId(type = IdType.AUTO)
-    @TableField("id")
     private Integer id;
     
     /**
