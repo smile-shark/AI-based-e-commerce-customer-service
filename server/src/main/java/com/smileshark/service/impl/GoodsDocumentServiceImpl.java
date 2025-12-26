@@ -8,6 +8,7 @@ import com.smileshark.mapper.GoodsDocumentMapper;
 import com.smileshark.service.GoodsDocumentService;
 import com.smileshark.utils.FileToDocuments;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,9 +21,11 @@ import static com.smileshark.code.DocumentCode.GOODS_ID;
 @Service
 public class GoodsDocumentServiceImpl extends ServiceImpl<GoodsDocumentMapper, GoodsDocument> implements GoodsDocumentService {
     private final FileToDocuments fileToDocuments;
+    private final MilvusVectorStore vectorStore;
 
-    public GoodsDocumentServiceImpl(FileToDocuments fileToDocuments) {
+    public GoodsDocumentServiceImpl(FileToDocuments fileToDocuments, MilvusVectorStore vectorStore) {
         this.fileToDocuments = fileToDocuments;
+        this.vectorStore = vectorStore;
     }
 
     @Override
@@ -53,19 +56,25 @@ public class GoodsDocumentServiceImpl extends ServiceImpl<GoodsDocumentMapper, G
             document.getMetadata().put(FILE_ID, fileInfo.getId());
             document.getMetadata().put(GOODS_ID, goodsId);
         });
-        // TODO 使用 Milvus 进行向量存储
-
-        return null;
+        // 使用 Milvus 进行向量存储
+        vectorStore.add(documents);
+        return Result.success(ResultCode.ADD_SUCCESS);
     }
 
     @Override
     @Transactional
     public Result<?> delete(Integer id) {
+        // 查询要删除的文件信息，用于从向量数据库中删除对应的向量
+        GoodsDocument fileInfo = getById(id);
+        if (fileInfo == null) {
+            return Result.error(ResultCode.DELETE_ERROR);
+        }
+        
         if (!removeById(id)) {
             return Result.error(ResultCode.DELETE_ERROR);
         }
-        // TODO 根据上传的id删除向量数据库中的数据
-
+        // 根据文件id删除向量数据库中的数据
+        vectorStore.delete(String.format("\"%s\" = %d", FILE_ID, id));
         return Result.success(ResultCode.DELETE_SUCCESS);
     }
 }

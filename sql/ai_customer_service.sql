@@ -41,10 +41,13 @@ CREATE TABLE `role` (
   `ct_id` int COMMENT '关联的商户，每个商户有一个客户的角色'
 );
 
+drop table `session`;
 CREATE TABLE `session` (
-  `id` int PRIMARY KEY AUTO_INCREMENT COMMENT '会话id',
-  `ct_id` int COMMENT '关联的商户',
-  `user_id` int COMMENT '关联的客户'
+   `id` int PRIMARY KEY AUTO_INCREMENT COMMENT '会话id',
+   `ct_id` int COMMENT '关联的商户',
+   `user_id` int COMMENT '关联的客户',
+   `goods_id` int COMMENT '关联的商品，RAG会根据这个取查询对应商品的知识',
+   `conversation_status` enum('AI', 'HUMAN') DEFAULT 'AI' COMMENT '会话状态，AI表示AI对话，HUMAN表示人工对话'
 );
 
 CREATE TABLE `session_log` (
@@ -52,6 +55,7 @@ CREATE TABLE `session_log` (
   `content` text COMMENT '对话的内容',
   `type` enum('USER','ASSISTANT','SYSTEM','TOOL','COMMERCIAL_TENANT') COMMENT '对话人身份',
   `timestamp` datetime DEFAULT (now()) COMMENT '记录创建的时间',
+  `read_status` enum('READ', 'UNREAD') DEFAULT 'UNREAD' COMMENT '消息已读状态，READ表示已读，UNREAD表示未读',
   `session_id` int COMMENT '关联的会话'
 );
 
@@ -87,3 +91,5 @@ ALTER TABLE `session` ADD FOREIGN KEY (`ct_id`) REFERENCES `commercial_tenant` (
 ALTER TABLE `session` ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 ALTER TABLE `session_log` ADD FOREIGN KEY (`session_id`) REFERENCES `session` (`id`);
+
+ALTER TABLE `session` ADD FOREIGN KEY (`goods_id`) REFERENCES `goods` (`id`);

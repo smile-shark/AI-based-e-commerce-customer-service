@@ -1,4 +1,9 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      password: 123456
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
@@ -14,3 +19,28 @@ spring:
         options:
           model: text-embedding-v4 # 向量模型
           dimensions: 2048 # 向量维度
+    vectorstore:
+      milvus:
+        client:
+          host: localhost  # Milvus 服务器地址
+          port: 19530      # Milvus 服务器端口
+        database-name: "default"           # 数据库名称
+        collection-name: "vector_store"    # 集合名称
+        embedding-dimension: 2048          # 嵌入向量的维度，应与 embedding 模型输出维度一致
+        # 索引类型，可选值：ivf_flat, ivf_sq8, ivf_pq, hnsw, diskann, flat
+        # ivf_flat: 倒排文件平面索引，平衡了内存使用和搜索精度
+        # ivf_sq8: 倒排文件标量量化索引，节省内存但略有精度损失
+        # ivf_pq: 倒排文件产品量化索引，大幅节省内存，适合大规模数据
+        # hnsw: 分层导航小世界图索引，搜索速度快，适合高维向量
+        # diskann: 磁盘ANN索引，适合超大规模数据集
+        # flat: 平面索引，精确搜索但速度慢，适合小数据集
+        index-type: ivf_flat
+        # 度量类型，可选值：l2, ip, cosine
+        # l2: 欧几里得距离，适合计算向量间的真实距离
+        # ip: 内积，适合推荐系统等场景
+        # cosine: 余弦相似度，适合文本相似度计算
+        metric-type: cosine
+        initialize-schema: true  # 是否自动创建 schema
+session:
+  key: session
+  expiration-duration: 5 # min

@@ -29,6 +29,13 @@ public class SessionLog {
     }
     
     /**
+     * 消息已读状态枚举
+     */
+    public enum ReadStatus {
+        READ, UNREAD
+    }
+    
+    /**
      * 记录的id
      */
     @TableId(type = IdType.AUTO)
@@ -44,7 +51,7 @@ public class SessionLog {
      * 对话人身份
      */
     @TableField("type")
-    private String type;
+    private Type type;
     
     /**
      * 记录创建的时间
@@ -57,4 +64,10 @@ public class SessionLog {
      */
     @TableField("session_id")
     private Integer sessionId;
+    
+    /**
+     * 消息已读状态，READ表示已读，UNREAD表示未读
+     */
+    @TableField("read_status")
+    private ReadStatus readStatus;
 }

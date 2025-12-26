@@ -18,6 +18,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @TableName("session")
 public class Session {
+    
+    /**
+     * 会话状态枚举
+     */
+    public enum ConversationStatus {
+        AI, HUMAN
+    }
+    
     /**
      * 会话id
      */
@@ -35,4 +43,16 @@ public class Session {
      */
     @TableField("user_id")
     private Integer userId;
+
+    /**
+     * 关联的商品，RAG会根据这个取查询对应商品的知识
+     */
+    @TableField("goods_id")
+    private Integer goodsId;
+    
+    /**
+     * 会话状态，AI表示AI对话，HUMAN表示人工对话
+     */
+    @TableField("conversation_status")
+    private ConversationStatus conversationStatus;
 }

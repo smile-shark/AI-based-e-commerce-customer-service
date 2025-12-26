@@ -10,17 +10,23 @@ import com.smileshark.mapper.GoodsMapper;
 import com.smileshark.service.GoodsDocumentService;
 import com.smileshark.service.GoodsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.smileshark.code.DocumentCode.FILE_ID;
+import static com.smileshark.code.DocumentCode.GOODS_ID;
+
 @Service
 @RequiredArgsConstructor
 public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements GoodsService {
     private final GoodsDocumentService goodsDocumentService;
     private final GoodsDocumentMapper goodsDocumentMapper;
+    private final MilvusVectorStore vectorStore;
 
     @Override
     @Transactional
@@ -32,11 +38,17 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     @Transactional
     public int delete(Integer id) {
-        // 查询到对应商品所关联的文档
-        List<GoodsDocument> documents = goodsDocumentService.getListByGoodsId(id);
-        // TODO 删除向量数据库中对应的文档
-
-
+        // 删除向量数据库中对应的文档
+        goodsDocumentMapper.delete(new LambdaQueryWrapper<>(GoodsDocument.class)
+                .eq(GoodsDocument::getGoodsId, id));
+        // 删除向量数据库中对应的向量
+        /*
+        这里可以使用两种方案，一种是通过 SpringAI提供的filterExpression来进行构建
+        另一种是通过自己拼接字符串来处理
+         */
+        // vectorStore.delete(new Filter.Expression(Filter.ExpressionType.EQ, new Filter.Key(GOODS_ID), new Filter.Value(id)));
+        vectorStore.delete(String.format("\"%s\" = %d", GOODS_ID, id));
+        // 删除商品表数据
         return baseMapper.deleteById(id);
     }
 
