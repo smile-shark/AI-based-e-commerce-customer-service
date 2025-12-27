@@ -7,6 +7,7 @@ import com.smileshark.entity.GoodsDocument;
 import com.smileshark.mapper.GoodsDocumentMapper;
 import com.smileshark.service.GoodsDocumentService;
 import com.smileshark.utils.FileToDocuments;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,10 @@ import static com.smileshark.code.DocumentCode.FILE_ID;
 import static com.smileshark.code.DocumentCode.GOODS_ID;
 
 @Service
+@RequiredArgsConstructor
 public class GoodsDocumentServiceImpl extends ServiceImpl<GoodsDocumentMapper, GoodsDocument> implements GoodsDocumentService {
     private final FileToDocuments fileToDocuments;
     private final MilvusVectorStore vectorStore;
-
-    public GoodsDocumentServiceImpl(FileToDocuments fileToDocuments, MilvusVectorStore vectorStore) {
-        this.fileToDocuments = fileToDocuments;
-        this.vectorStore = vectorStore;
-    }
 
     @Override
     public List<GoodsDocument> getListByGoodsId(Integer id) {
