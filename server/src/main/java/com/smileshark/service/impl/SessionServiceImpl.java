@@ -7,6 +7,7 @@ import com.smileshark.entity.Role;
 import com.smileshark.entity.Session;
 import com.smileshark.mapper.RoleMapper;
 import com.smileshark.mapper.SessionMapper;
+import com.smileshark.service.RoleService;
 import com.smileshark.service.SessionService;
 import com.smileshark.utils.KeyUtils;
 import com.smileshark.utils.SessionFind;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> implements SessionService {
-    private final RoleMapper roleMapper;
+    private final RoleService roleService;
     private final StringRedisTemplate stringRedisTemplate;
     private final SessionFind sessionFind;
     @Value("${session.key}")
@@ -50,8 +51,7 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
                 .goodsId(message.getGoodsId());
 
         // 判断一下这个商户是否设置了AI客服
-        Role role = roleMapper.selectOne(new LambdaQueryWrapper<>(Role.class)
-                .eq(Role::getCtId, message.getCtId()));
+        Role role = roleService.getRoleByCtId(message.getCtId());
         if (role == null) {
             // 没有AI客服就设置为人工会话
             sessionBuilder.conversationStatus(Session.ConversationStatus.HUMAN);

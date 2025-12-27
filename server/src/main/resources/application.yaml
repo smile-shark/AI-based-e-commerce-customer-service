@@ -44,3 +44,8 @@ spring:
 session:
   key: session
   expiration-duration: 5 # min
+role:
+  key: role
+  expiration-duration: 5 # min
+memory:
+  redis-length: 10

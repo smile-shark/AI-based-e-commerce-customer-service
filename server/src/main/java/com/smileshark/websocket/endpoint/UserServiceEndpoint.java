@@ -58,15 +58,15 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
         // 判断session的类型
         switch (chatSession.getConversationStatus()) {
             case AI -> {
-                aiService.turnToManualJudgment(chatSession,message);
-                if(chatSession.getConversationStatus()== com.smileshark.entity.Session.ConversationStatus.HUMAN){
+                aiService.turnToManualJudgment(chatSession, message);
+                if (chatSession.getConversationStatus() == com.smileshark.entity.Session.ConversationStatus.HUMAN) {
                     // 背AI判定为需要转人工
                     CommercialTenantEndpoint ctEndPoint = sessionFind.findCommercialTenantEndPoint(message.getSessionId());
                     if (ctEndPoint != null) {
                         ctEndPoint.sendMessage(message);
                     }
-                }else{
-                    aiService.chat(chatSession,message,this);
+                } else {
+                    aiService.chat(chatSession, message, this);
                 }
             }
             case HUMAN -> {

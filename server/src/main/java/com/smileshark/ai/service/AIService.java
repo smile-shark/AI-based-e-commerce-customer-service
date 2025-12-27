@@ -7,5 +7,5 @@ import com.smileshark.websocket.message.ChatMessage;
 public interface AIService {
     void turnToManualJudgment(Session chatSession, ChatMessage message);
 
-    void chat(Session chatSession, ChatMessage message, UserServiceEndpoint userServiceEndpoint);
+    void chat(Session chatSession, ChatMessage message, UserServiceEndpoint userServiceEndpoint) throws IllegalAccessException;
 }
