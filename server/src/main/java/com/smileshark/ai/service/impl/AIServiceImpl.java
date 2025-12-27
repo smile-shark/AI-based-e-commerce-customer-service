@@ -83,7 +83,7 @@ public class AIServiceImpl implements AIService {
                 pos.put(field.getName(), field.get(role));
             }
         }
-        // 使用ChatMemoryIdAdvisor传递会话ID，确保线程安全
+
         Flux<ChatResponse> chatResponse = chatClient.prompt()
                 .system(template.render(pos))
                 .user(message.getMessage())

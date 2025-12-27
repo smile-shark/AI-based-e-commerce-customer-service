@@ -1,11 +1,9 @@
 package com.smileshark.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.smileshark.entity.Role;
 import com.smileshark.entity.Session;
-import com.smileshark.mapper.RoleMapper;
 import com.smileshark.mapper.SessionMapper;
 import com.smileshark.service.RoleService;
 import com.smileshark.service.SessionService;
@@ -63,4 +61,5 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
         stringRedisTemplate.opsForValue().set(KeyUtils.redisKeyUtils(key, session.getId()), JSONUtil.toJsonStr(session), timeout, TimeUnit.MINUTES);
         return session;
     }
+
 }

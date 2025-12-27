@@ -43,9 +43,11 @@ spring:
         initialize-schema: true  # 是否自动创建 schema
 session:
   key: session
-  expiration-duration: 5 # min
+  expiration-duration: 10 # min
 role:
   key: role
-  expiration-duration: 5 # min
+  expiration-duration: 10 # min
 memory:
+  expiration-duration: 10 # min
+  key: memory
   redis-length: 10
