@@ -1,6 +1,7 @@
 package com.smileshark.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.smileshark.common.Result;
 import com.smileshark.entity.Session;
 import com.smileshark.websocket.message.ChatMessage;
 import org.springframework.ai.chat.messages.Message;
@@ -11,4 +12,7 @@ public interface SessionService extends IService<Session> {
 
     Session find(ChatMessage message, Integer userId);
 
+    Result<List<Session>> userGetLastSessionList(Integer userId);
+
+    Result<List<Session>> ctGetLastSessionList(Integer ctId);
 }

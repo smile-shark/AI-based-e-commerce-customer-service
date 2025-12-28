@@ -2,6 +2,8 @@ package com.smileshark.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.smileshark.code.ResultCode;
+import com.smileshark.common.Result;
 import com.smileshark.entity.Role;
 import com.smileshark.entity.Session;
 import com.smileshark.mapper.SessionMapper;
@@ -17,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -62,4 +65,25 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
         return session;
     }
 
+    @Override
+    public Result<List<Session>> userGetLastSessionList(Integer userId) {
+        return Result.success(
+                ResultCode.GET_SUCCESS,
+                lambdaQuery()
+                        .eq(Session::getUserId, userId)
+                        .orderByDesc(Session::getTimestamp)
+                        .list()
+        );
+    }
+
+    @Override
+    public Result<List<Session>> ctGetLastSessionList(Integer ctId) {
+        return Result.success(
+                ResultCode.GET_SUCCESS,
+                lambdaQuery()
+                        .eq(Session::getCtId, ctId)
+                        .orderByDesc(Session::getTimestamp)
+                        .list()
+        );
+    }
 }

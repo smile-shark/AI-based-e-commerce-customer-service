@@ -22,7 +22,7 @@ public interface WebSocketEndpoint {
     /**
      * 接收到消息时的处理方法
      */
-    void onMessage(ChatMessage message, Session session) throws EncodeException, IOException;
+    void onMessage(ChatMessage message, Session session) throws EncodeException, IOException, IllegalAccessException;
     
     /**
      * 发生错误时的处理方法

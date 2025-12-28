@@ -1,11 +1,15 @@
 package com.smileshark.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.smileshark.code.ResultCode;
+import com.smileshark.common.Result;
 import com.smileshark.entity.Session;
 import com.smileshark.entity.SessionLog;
 import com.smileshark.mapper.SessionLogMapper;
+import com.smileshark.mapper.SessionMapper;
 import com.smileshark.service.SessionLogService;
 import com.smileshark.utils.KeyUtils;
 import com.smileshark.utils.TypeConversion;
@@ -25,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SessionLogServiceImpl extends ServiceImpl<SessionLogMapper, SessionLog> implements SessionLogService {
     private final StringRedisTemplate stringRedisTemplate;
+    private final SessionMapper sessionMapper;
     @Value("${memory.redis-length}")
     private Integer memoryLength;
     @Value("${memory.expiration-duration}")
@@ -65,6 +70,76 @@ public class SessionLogServiceImpl extends ServiceImpl<SessionLogMapper, Session
         if (Optional.ofNullable(stringRedisTemplate.opsForList().size(KeyUtils.redisKeyUtils(memoryKey, sessionId))).orElse(0L) > memoryLength) {
             stringRedisTemplate.opsForList().trim(KeyUtils.redisKeyUtils(memoryKey, sessionId), -memoryLength, -1);
         }
+    }
+
+    @Override
+    public Result<?> readCtMessage(Integer sessionId, Integer userId) {
+        // 检查是否有该会话
+        Session session = sessionMapper.selectOne(new LambdaQueryWrapper<>(Session.class)
+                .eq(Session::getId, sessionId)
+                .eq(Session::getUserId, userId)
+        );
+        if (session == null) {
+            return Result.error(ResultCode.NOT_FOUND);
+        }
+        // 修改这个session的关于商户或者AI发送的消息
+        lambdaUpdate().set(SessionLog::getReadStatus, SessionLog.ReadStatus.READ)
+                .eq(SessionLog::getSessionId, sessionId)
+                .eq(SessionLog::getType, SessionLog.Type.ASSISTANT)
+                .or()
+                .eq(SessionLog::getType, SessionLog.Type.COMMERCIAL_TENANT)
+                .update();
+        return Result.success(ResultCode.UPDATE_SUCCESS);
+    }
+
+    @Override
+    public Result<?> readUserMessage(Integer sessionId, Integer ctId) {
+        // 检查是否有该会话
+        Session session = sessionMapper.selectOne(new LambdaQueryWrapper<>(Session.class)
+                .eq(Session::getId, sessionId)
+                .eq(Session::getCtId, ctId)
+        );
+        if (session == null) {
+            return Result.error(ResultCode.NOT_FOUND);
+        }
+        // 修改这个session的关于商户或者AI发送的消息
+        lambdaUpdate().set(SessionLog::getReadStatus, SessionLog.ReadStatus.READ)
+                .eq(SessionLog::getSessionId, sessionId)
+                .eq(SessionLog::getType, SessionLog.Type.USER)
+                .update();
+        return Result.success(ResultCode.UPDATE_SUCCESS);
+    }
+
+    @Override
+    public Result<List<SessionLog>> getWindowMessage(Integer sessionId) {
+        return Result.success(
+                ResultCode.GET_SUCCESS,
+                lambdaQuery().eq(SessionLog::getSessionId, sessionId)
+                        .orderByAsc(SessionLog::getTimestamp)
+                        .list()
+        );
+    }
+
+    @Override
+    public Result<Integer> userGetUnreadMessageCount(Integer sessionId) {
+        return Result.success(
+                ResultCode.GET_SUCCESS,
+                lambdaQuery().eq(SessionLog::getSessionId, sessionId)
+                        .eq(SessionLog::getType, SessionLog.Type.COMMERCIAL_TENANT)
+                        .or()
+                        .eq(SessionLog::getType, SessionLog.Type.ASSISTANT)
+                        .count().intValue()
+        );
+    }
+
+    @Override
+    public Result<Integer> ctGetUnreadMessageCount(Integer sessionId) {
+        return Result.success(
+                ResultCode.GET_SUCCESS,
+                lambdaQuery().eq(SessionLog::getSessionId, sessionId)
+                        .eq(SessionLog::getType, SessionLog.Type.USER)
+                        .count().intValue()
+        );
     }
 
     @Override

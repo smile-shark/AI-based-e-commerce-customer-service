@@ -45,7 +45,7 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
 
     @OnMessage
     @Transactional
-    public void onMessage(ChatMessage message, Session session) throws EncodeException, IOException {
+    public void onMessage(ChatMessage message, Session session) throws EncodeException, IOException, IllegalAccessException {
         message.setType(getEndpointType());
         // 判断是否有对应的sessionId如果没有就表示是第一次聊天
         com.smileshark.entity.Session chatSession = sessionService.find(message, userId);

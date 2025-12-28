@@ -21,7 +21,7 @@ public enum ResultCode {
     UPDATE_SUCCESS(200, "修改成功"),
     USER_NOT_EXIST(404, "用户不存在"),
     PASSWORD_ERROR(501, "密码错误"),
-    LOGIN_SUCCESS(200, "登录成功"), ADD_ERROR(500, "保存失败"), DELETE_ERROR(500, "删除失败"), UPDATE_ERROR(500, "修改失败");
+    LOGIN_SUCCESS(200, "登录成功"), ADD_ERROR(500, "保存失败"), DELETE_ERROR(500, "删除失败"), UPDATE_ERROR(500, "修改失败"), GET_SUCCESS(200, "查询成功");
     private final int code;
     private final String message;
 

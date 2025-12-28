@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 会话实体类，一个商家和客户的会话id
  */
@@ -55,4 +57,7 @@ public class Session {
      */
     @TableField("conversation_status")
     private ConversationStatus conversationStatus;
+
+    @TableField("timestamp")
+    private LocalDateTime timestamp;
 }
