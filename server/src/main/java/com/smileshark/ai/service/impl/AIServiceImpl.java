@@ -20,6 +20,7 @@ import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugment
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.template.st.StTemplateRenderer;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -39,6 +40,7 @@ public class AIServiceImpl implements AIService {
     private final RoleService roleService;
     private final CustomizationMemoryAdviser memoryAdviser;
     private final DashScopeChatModel dashscopeChatModel;
+    private final VectorStore vectorStore;
     @Value("classpath:template/convert-to-manual-judgment-prompts.st")
     private Resource convertToManualJudgmentPromptsResource;
     @Value("classpath:template/customer-service-role.st")
@@ -70,13 +72,17 @@ public class AIServiceImpl implements AIService {
         Role role = roleService.getRoleByCtId(chatSession.getCtId());
         // 进行模板的关键词插入
         PromptTemplate template = PromptTemplate.builder()
-                .renderer(StTemplateRenderer.builder().build())
+                // 文件中使用的是 <> 作为占位符，这样的配置更加的灵活
+                .renderer(StTemplateRenderer.builder()
+                        .startDelimiterToken('<')
+                        .endDelimiterToken('>')
+                        .build())
                 .resource(customerServiceRoleResource)
                 .build();
         HashMap<String, Object> pos = new HashMap<>();
         // 使用的反射的方式将需要填入的值提取出来
         Class<? extends Role> aClass = role.getClass();
-        for (Field field : aClass.getFields()) {
+        for (Field field : aClass.getDeclaredFields()) {
             // 判断属性的类型为String才使用
             if (field.getType() == String.class) {
                 field.setAccessible(true);
@@ -92,6 +98,7 @@ public class AIServiceImpl implements AIService {
                 .advisors(
                         memoryAdviser,
                         RetrievalAugmentationAdvisor.builder()
+                                .order(1) // 确保在记忆存储之后
                                 // 配置文档检索器
                                 .documentRetriever(
                                         VectorStoreDocumentRetriever.builder()
@@ -107,6 +114,7 @@ public class AIServiceImpl implements AIService {
                                                                 new Filter.Value(chatSession.getGoodsId())
                                                         )
                                                 )
+                                                .vectorStore(vectorStore)
                                                 .build()
                                 )
                                 // 配置查询增强器
@@ -128,8 +136,14 @@ public class AIServiceImpl implements AIService {
                                                 .chatClientBuilder(ChatClient.builder(dashscopeChatModel))
                                                 .targetSearchSystem("商品客服小助手")
                                                 .promptTemplate(
+                                                        // 这里如果不设置自定义的模板，那么就会使用默认的模板，模板中要求 target,query 两个参数，所以必须查询
                                                         PromptTemplate.builder()
-                                                                .template("你是一个商品客服助手，你的任务是将用户的模糊查询重写成一个清晰、独立的搜索查询，便于在商品知识库中检索相关信息。")
+                                                                .template("""
+                                                                        你是一个{target}的搜索查询专家。
+                                                                        请将用户的模糊查询重写为一个清晰、简洁、独立的搜索查询，只输出重写后的查询，不要添加任何解释。
+                                                                        用户查询：{query}
+                                                                        重写后的搜索查询：
+                                                                        """)
                                                                 .build()
                                                 )
                                                 .build()
@@ -146,5 +160,7 @@ public class AIServiceImpl implements AIService {
                     .message(response.getResult().getOutput().getText())
                     .build());
         }
+        // 确认AI回复结束
+        userServiceEndpoint.sendMessage(ChatMessage.builder().state(ChatMessage.State.END).build());
     }
 }

@@ -13,7 +13,7 @@ spring:
     dashscope:
       chat:
         options:
-          model: qwen-vl-plus # 聊天模型
+          model: qwen-plus # 聊天模型
       api-key: ${DASHSCOPE_KEY} # 密钥
       embedding:
         options:

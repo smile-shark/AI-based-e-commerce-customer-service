@@ -9,6 +9,7 @@ import com.smileshark.service.GoodsDocumentService;
 import com.smileshark.utils.FileToDocuments;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,7 @@ public class GoodsDocumentServiceImpl extends ServiceImpl<GoodsDocumentMapper, G
             return Result.error(ResultCode.DELETE_ERROR);
         }
         // 根据文件id删除向量数据库中的数据
-        vectorStore.delete(String.format("\"%s\" = %d", FILE_ID, id));
+        vectorStore.delete(new Filter.Expression(Filter.ExpressionType.EQ,new Filter.Key(FILE_ID),new Filter.Value(id)));
         return Result.success(ResultCode.DELETE_SUCCESS);
     }
 }

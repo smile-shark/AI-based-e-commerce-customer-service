@@ -25,7 +25,8 @@ public class TypeConversion {
     public static Message sessionToMessage(SessionLog.Type sessionType,String content) {
         return switch (sessionType) {
             case USER -> UserMessage.builder().text(content).build();
-            case ASSISTANT, COMMERCIAL_TENANT -> AssistantMessage.builder().content(content).build();
+//            case ASSISTANT, COMMERCIAL_TENANT -> AssistantMessage.builder().content(content).build(); // 这个是SpringAI1.1.0+写法
+            case ASSISTANT, COMMERCIAL_TENANT -> new AssistantMessage(content);
             case SYSTEM -> SystemMessage.builder().text(content).build();
             case TOOL -> null;
         };

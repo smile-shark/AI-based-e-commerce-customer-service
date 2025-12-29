@@ -19,6 +19,6 @@ public class ChatMessage {
     private State state = State.SUCCESS;
 
     public enum State {
-        SUCCESS, ERROR
+        SUCCESS, ERROR, SURE ,END
     }
 }

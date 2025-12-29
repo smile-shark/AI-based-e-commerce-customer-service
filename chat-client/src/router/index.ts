@@ -3,6 +3,8 @@ import CtHome from '../views/ct/CtHome.vue'
 import UserHome from '../views/user/UserHome.vue'
 import CtLogin from '../views/ct/Login.vue'
 import UserLogin from '../views/user/Login.vue'
+import GoodsList from '../views/user/GoodsList.vue'
+import UserChat from '../views/user/UserChat.vue'
 
 const routes = [
   {
@@ -28,6 +30,16 @@ const routes = [
     path: '/user/home',
     name: 'UserManagement',
     component: UserHome
+  },
+  {
+    path: '/user/goods',
+    name: 'GoodsList',
+    component: GoodsList
+  },
+  {
+    path: '/user/chat',
+    name: 'UserChat',
+    component: UserChat
   }
 ]
 

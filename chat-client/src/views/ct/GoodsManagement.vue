@@ -61,10 +61,16 @@
         <div class="documents-section">
           <h4>商品文档</h4>
           <div class="upload-section">
-            <input type="file" ref="fileInput" @change="handleFileSelect" accept=".pdf,.doc,.docx">
-            <button @click="uploadDocument" :disabled="!selectedFile || uploading" class="upload-btn">
-              {{ uploading ? '上传中...' : '上传文档' }}
-            </button>
+            <input
+              type="file"
+              ref="fileInput"
+              @change="handleFileSelect"
+              accept=".md,.pdf,.txt"
+              :disabled="uploading"
+            >
+            <div v-if="uploading" class="upload-status">
+              正在上传...
+            </div>
           </div>
 
           <div class="documents-list">
@@ -206,12 +212,31 @@ const viewDetail = async (id: number) => {
 }
 
 // 处理文件选择
-const handleFileSelect = (event: Event) => {
+const handleFileSelect = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  if (file) {
-    selectedFile.value = file
+  if (!file) return
+
+  // 检查文件类型
+  const allowedTypes = ['text/markdown', 'application/pdf', 'text/plain']
+  const allowedExtensions = ['.md', '.pdf', '.txt']
+
+  const isAllowedType = allowedTypes.includes(file.type)
+  const hasAllowedExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+
+  if (!isAllowedType && !hasAllowedExtension) {
+    alert('只允许上传 .md、.pdf 或 .txt 格式的文件')
+    // 清空文件输入
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+    return
   }
+
+  selectedFile.value = file
+
+  // 自动上传
+  await uploadDocument()
 }
 
 // 上传文档
@@ -229,10 +254,11 @@ const uploadDocument = async () => {
       // 重新加载商品详情
       await viewDetail(currentGoods.value.id)
     } else {
-      alert(response.message)
+      alert(response.message || '上传失败')
     }
   } catch (error) {
     console.error('上传文档失败:', error)
+    alert('上传失败，请重试')
   } finally {
     uploading.value = false
   }

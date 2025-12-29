@@ -19,7 +19,7 @@ public class SessionFind {
     @Value("${session.expiration-duration}")
     private Integer timeout;
     @Value("${session.key}")
-    private Integer key;
+    private String key;
     private final StringRedisTemplate stringRedisTemplate;
 
     /**
@@ -64,4 +64,5 @@ public class SessionFind {
         // 通过session中的ctId查找对应的商户endPoint
         return CommercialTenantEndpoint.findEndPoint(session.getCtId());
     }
+
 }

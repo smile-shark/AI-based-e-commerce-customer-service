@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import userApi from '../../api/userApi'
 import { setUserInfo } from '../../utils/storage'
+import { getUserWebSocketClient } from '../../utils/websocket'
 
 const router = useRouter()
 const account = ref('')
@@ -29,6 +30,17 @@ const handleLogin = async () => {
       // 登录成功，存储用户信息并跳转到用户主页
       if (response.data) {
         setUserInfo(response.data)
+        // 同时存储用户ID用于API调用
+        localStorage.setItem('userId', response.data.id.toString())
+
+        // 建立WebSocket连接
+        try {
+          const wsClient = getUserWebSocketClient(response.data.id)
+          await wsClient.connect()
+          console.log('User WebSocket connected after login')
+        } catch (wsError) {
+          console.error('Failed to establish WebSocket connection:', wsError)
+        }
       }
       router.push('/user/home')
     } else {

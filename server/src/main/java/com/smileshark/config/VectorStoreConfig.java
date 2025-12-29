@@ -26,7 +26,7 @@ public class VectorStoreConfig {
      * @return VectorStore
      */
     @Bean
-    public VectorStore vectorStore() {
+    public VectorStore milvusVectorStore() {
         return MilvusVectorStore.builder(milvusClient, dashScopeEmbeddingModel).build();
     }
 }

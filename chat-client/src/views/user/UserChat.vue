@@ -1,10 +1,11 @@
 <template>
-  <div class="chat">
+  <div class="user-chat">
     <div class="chat-container">
       <!-- 会话列表 -->
       <div class="session-list">
         <div class="session-header">
-          <h3>客户会话</h3>
+          <h3>我的会话</h3>
+          <button @click="goBack" class="back-btn">返回</button>
         </div>
         <div class="sessions">
           <div
@@ -13,12 +14,8 @@
             :class="['session-item', { active: selectedSession?.id === session.id }]"
             @click="selectSession(session)"
           >
-            <div class="session-avatar">
-              <div class="avatar-circle">客</div>
-            </div>
             <div class="session-info">
-              <div class="user-name">用户{{ session.userId }}</div>
-              <div class="goods-name">咨询商品{{ session.goodsId }}</div>
+              <div class="goods-name">商品: {{ getGoodsName(session.goodsId) }}</div>
               <div class="last-message">{{ getLastMessage(session) }}</div>
             </div>
             <div class="session-meta">
@@ -26,17 +23,7 @@
               <div v-if="getUnreadCount(session.id) > 0" class="unread-badge">
                 {{ getUnreadCount(session.id) }}
               </div>
-              <div class="status-indicator">
-                <span :class="['status-dot', session.conversationStatus.toLowerCase()]"></span>
-              </div>
             </div>
-          </div>
-
-          <!-- 空状态 -->
-          <div v-if="sessionList.length === 0" class="empty-sessions">
-            <div class="empty-icon">💬</div>
-            <h4>暂无客户会话</h4>
-            <p>当有客户咨询商品时，会话将显示在这里</p>
           </div>
         </div>
       </div>
@@ -53,16 +40,11 @@
         <div v-else class="chat-content">
           <!-- 聊天头部 -->
           <div class="chat-header">
-            <div class="user-info">
-              <div class="user-avatar">用</div>
-              <div class="user-details">
-                <div class="user-name">用户{{ selectedSession.userId }}</div>
-                <div class="goods-info">咨询商品{{ selectedSession.goodsId }}</div>
-                <div class="session-status">
-                  <span :class="['status-badge', selectedSession.conversationStatus.toLowerCase()]">
-                    {{ selectedSession.conversationStatus === 'AI' ? 'AI客服中' : '人工服务中' }}
-                  </span>
-                </div>
+            <div class="goods-info">
+              <div class="goods-avatar">商</div>
+              <div class="goods-details">
+                <div class="goods-name">{{ getGoodsName(selectedSession.goodsId) }}</div>
+                <div class="goods-status">正在咨询中</div>
               </div>
             </div>
           </div>
@@ -73,20 +55,19 @@
               v-for="message in messages"
               :key="message.id"
               :class="['message', {
-                'own-message': message.type === 'COMMERCIAL_TENANT',
-                'user-message': message.type === 'USER',
+                'own-message': message.type === 'USER',
                 'ai-message': message.type === 'ASSISTANT',
                 'system-message': message.type === 'SYSTEM'
               }]"
             >
-              <div class="message-avatar" v-if="message.type !== 'COMMERCIAL_TENANT'">
+              <div class="message-avatar" v-if="message.type !== 'USER'">
                 {{ getMessageAvatar(message.type) }}
               </div>
               <div class="message-content">
                 <div class="message-text">{{ message.content }}</div>
                 <div class="message-time">{{ formatTime(message.timestamp) }}</div>
               </div>
-              <div class="message-avatar own-avatar" v-if="message.type === 'COMMERCIAL_TENANT'">
+              <div class="message-avatar own-avatar" v-if="message.type === 'USER'">
                 我
               </div>
             </div>
@@ -99,20 +80,10 @@
               @keyup.enter="sendMessage"
               type="text"
               placeholder="输入消息..."
-              :disabled="selectedSession?.conversationStatus === 'AI'"
+              :disabled="isTyping"
             >
-            <button
-              @click="sendMessage"
-              :disabled="!newMessage.trim() || selectedSession?.conversationStatus === 'AI'"
-            >
-              发送
-            </button>
-            <button
-              v-if="selectedSession?.conversationStatus === 'AI'"
-              @click="takeOverSession"
-              class="take-over-btn"
-            >
-              人工接管
+            <button @click="sendMessage" :disabled="!newMessage.trim() || isTyping">
+              {{ isTyping ? 'AI回复中...' : '发送' }}
             </button>
           </div>
         </div>
@@ -123,15 +94,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { getCtSessionList } from '@/api/sessionApi'
+import { useRouter, useRoute } from 'vue-router'
+import { getUserSessionList } from '@/api/sessionApi'
 import { getWindowMessage, readCtMessage } from '@/api/sessionLogApi'
-import { getCtWebSocketClient } from '@/utils/websocket'
+import { getUserWebSocketClient } from '@/utils/websocket'
 import type { SessionItem } from '@/api/sessionApi'
 import type { MessageItem } from '@/api/sessionLogApi'
 import type { ChatMessage, WebSocketMessage } from '@/utils/websocket'
 
 const router = useRouter()
+const route = useRoute()
 
 // 数据
 const sessionList = ref<SessionItem[]>([])
@@ -139,6 +111,7 @@ const selectedSession = ref<SessionItem | null>(null)
 const messages = ref<MessageItem[]>([])
 const newMessage = ref('')
 const messagesContainer = ref<HTMLElement>()
+const isTyping = ref(false)
 const unreadCounts = ref<Record<number, number>>({})
 
 // AI流式消息累积
@@ -146,6 +119,14 @@ const aiStreamingMessage = ref<MessageItem | null>(null)
 
 // WebSocket客户端
 let wsClient: any = null
+
+// 商品名称映射
+const goodsNameMap = ref<Record<number, string>>({})
+
+// 获取商品名称
+const getGoodsName = (goodsId: number) => {
+  return goodsNameMap.value[goodsId] || `商品${goodsId}`
+}
 
 // 获取最后消息
 const getLastMessage = (session: SessionItem) => {
@@ -161,9 +142,9 @@ const getUnreadCount = (sessionId: number) => {
 // 获取消息头像
 const getMessageAvatar = (type: string) => {
   switch (type) {
-    case 'USER': return '客'
     case 'ASSISTANT': return 'AI'
     case 'SYSTEM': return '系'
+    case 'COMMERCIAL_TENANT': return '商'
     default: return '?'
   }
 }
@@ -188,13 +169,14 @@ const formatTime = (timestamp: string) => {
 // 加载会话列表
 const loadSessionList = async () => {
   try {
-    const ctId = localStorage.getItem('ctId')
-    if (!ctId) {
-      router.push('/ct/login')
+    // 从本地存储获取用户ID（实际应该从登录状态获取）
+    const userId = localStorage.getItem('userId')
+    if (!userId) {
+      router.push('/user/login')
       return
     }
 
-    const response = await getCtSessionList(parseInt(ctId))
+    const response = await getUserSessionList(parseInt(userId))
     if (response.code === 200) {
       sessionList.value = response.data
     }
@@ -234,10 +216,10 @@ const loadMessages = async (sessionId: number) => {
 // 标记为已读
 const markAsRead = async (sessionId: number) => {
   try {
-    const ctId = localStorage.getItem('ctId')
-    if (!ctId) return
+    const userId = localStorage.getItem('userId')
+    if (!userId) return
 
-    await readCtMessage(sessionId, parseInt(ctId))
+    await readCtMessage(sessionId, parseInt(userId))
     unreadCounts.value[sessionId] = 0
   } catch (error) {
     console.error('Failed to mark as read:', error)
@@ -246,13 +228,17 @@ const markAsRead = async (sessionId: number) => {
 
 // 发送消息
 const sendMessage = () => {
-  if (!newMessage.value.trim() || !selectedSession.value) return
+  if (!newMessage.value.trim() || !selectedSession.value || !wsClient) return
+
+  // 检查是否是临时session（前端生成的ID，通常是时间戳）
+  const isTempSession = selectedSession.value.id > 1000000000000 // 时间戳ID通常大于这个值
 
   const message: ChatMessage = {
-    sessionId: selectedSession.value.id,
+    // 临时session不发送sessionId，让后端创建新的session
+    ...(isTempSession ? {} : { sessionId: selectedSession.value.id }),
     goodsId: selectedSession.value.goodsId,
     ctId: selectedSession.value.ctId,
-    type: 'COMMERCIAL_TENANT',
+    type: 'USER',
     message: newMessage.value.trim()
   }
 
@@ -263,7 +249,7 @@ const sendMessage = () => {
   const tempMessage: MessageItem = {
     id: Date.now(),
     content: message.message,
-    type: 'COMMERCIAL_TENANT',
+    type: 'USER',
     timestamp: new Date().toISOString(),
     sessionId: selectedSession.value.id,
     readStatus: 'READ'
@@ -274,25 +260,6 @@ const sendMessage = () => {
   nextTick(() => {
     scrollToBottom()
   })
-}
-
-// 人工接管会话
-const takeOverSession = () => {
-  if (!selectedSession.value) return
-
-  // 发送切换到人工的消息
-  const message: ChatMessage = {
-    sessionId: selectedSession.value.id,
-    goodsId: selectedSession.value.goodsId,
-    ctId: selectedSession.value.ctId,
-    type: 'COMMERCIAL_TENANT',
-    message: '[人工接管会话]'
-  }
-
-  wsClient.sendMessage(message)
-
-  // 更新会话状态为人工
-  selectedSession.value.conversationStatus = 'HUMAN'
 }
 
 // 接收消息
@@ -331,6 +298,9 @@ const handleMessage = (message: WebSocketMessage) => {
   if (message.state === 'END' && message.sessionId === selectedSession.value?.id) {
     console.log('AI streaming completed')
 
+    // 停止打字效果
+    isTyping.value = false
+
     // 清除流式消息累积
     aiStreamingMessage.value = null
 
@@ -356,6 +326,9 @@ const handleMessage = (message: WebSocketMessage) => {
           readStatus: 'READ'
         }
         messages.value.push(aiStreamingMessage.value)
+
+        // 开始打字效果
+        isTyping.value = true
       } else {
         // 累积流式内容
         aiStreamingMessage.value.content += message.message
@@ -385,12 +358,6 @@ const handleMessage = (message: WebSocketMessage) => {
       scrollToBottom()
     })
   }
-
-  // 更新会话列表中的最后消息
-  const session = sessionList.value.find(s => s.id === message.sessionId)
-  if (session) {
-    // 这里可以更新最后消息时间等
-  }
 }
 
 // 滚动到底部
@@ -400,27 +367,73 @@ const scrollToBottom = () => {
   }
 }
 
-// 移除返回函数，不需要返回商户中心按钮
+// 返回
+const goBack = () => {
+  router.push('/user/home')
+}
 
 // 初始化WebSocket
 const initWebSocket = async () => {
   try {
-    const ctId = localStorage.getItem('ctId')
-    if (!ctId) return
+    const userId = localStorage.getItem('userId')
+    if (!userId) return
 
-    wsClient = getCtWebSocketClient(parseInt(ctId))
-    await wsClient.connect()
+    wsClient = getUserWebSocketClient(parseInt(userId))
 
-    wsClient.onMessage(handleMessage)
-    console.log('WebSocket connected for CT:', ctId)
+    // 检查是否已经连接，如果未连接则建立连接
+    if (!wsClient.isConnected) {
+      await wsClient.connect()
+      wsClient.onMessage(handleMessage)
+      console.log('WebSocket connected for user:', userId)
+    } else {
+      // 如果已经连接，直接设置消息处理器
+      wsClient.onMessage(handleMessage)
+      console.log('WebSocket already connected for user:', userId)
+    }
   } catch (error) {
     console.error('Failed to connect WebSocket:', error)
+  }
+}
+
+// 检查是否从商品页面跳转过来
+const checkInitialSession = () => {
+  const { goodsId, ctId, goodsName } = route.query
+  if (goodsId && ctId) {
+    // 保存商品名称到映射
+    if (goodsName) {
+      goodsNameMap.value[parseInt(goodsId as string)] = goodsName as string
+    }
+
+    // 创建新会话或找到现有会话
+    const existingSession = sessionList.value.find(
+      (s: SessionItem) => s.goodsId === parseInt(goodsId as string) && s.ctId === parseInt(ctId as string)
+    )
+
+    if (existingSession) {
+      selectSession(existingSession)
+    } else {
+      // 如果没有现有会话，创建一个临时的前端会话显示（后端不会存储）
+      const tempSession: SessionItem = {
+        id: Date.now(), // 使用时间戳作为临时ID
+        ctId: parseInt(ctId as string),
+        userId: parseInt(localStorage.getItem('userId') || '0'),
+        goodsId: parseInt(goodsId as string),
+        conversationStatus: 'AI',
+        timestamp: new Date().toISOString()
+      }
+
+      // 将临时会话添加到会话列表前端显示
+      sessionList.value.unshift(tempSession)
+      selectedSession.value = tempSession
+      messages.value = []
+    }
   }
 }
 
 onMounted(async () => {
   await loadSessionList()
   await initWebSocket()
+  checkInitialSession()
 })
 
 onUnmounted(() => {
@@ -431,7 +444,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.chat {
+.user-chat {
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -446,7 +459,6 @@ onUnmounted(() => {
   max-height: calc(100vh - 80px);
 }
 
-/* 会话列表样式 */
 .session-list {
   width: 300px;
   background: white;
@@ -459,21 +471,32 @@ onUnmounted(() => {
 .session-header {
   padding: 16px;
   border-bottom: 1px solid #ddd;
-  background: white;
-  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .session-header h3 {
   margin: 0;
-  color: #333;
-  font-size: 18px;
-  font-weight: 600;
+}
+
+.back-btn {
+  padding: 6px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  background: #5a6268;
 }
 
 .sessions {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
 }
 
 .session-item {
@@ -481,40 +504,18 @@ onUnmounted(() => {
   align-items: center;
   padding: 12px 16px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
   position: relative;
-  margin: 0 8px;
-  border-radius: 6px;
 }
 
 .session-item:hover {
   background-color: #f8f9fa;
-  transform: translateX(2px);
 }
 
 .session-item.active {
   background-color: #e3f2fd;
   border-left: 3px solid #2196f3;
-  box-shadow: 0 1px 3px rgba(33, 150, 243, 0.2);
-}
-
-.session-avatar {
-  margin-right: 12px;
-}
-
-.avatar-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .session-info {
@@ -522,43 +523,31 @@ onUnmounted(() => {
   min-width: 0;
 }
 
-.user-name {
-  font-weight: 600;
-  font-size: 15px;
-  color: #333;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-}
-
 .goods-name {
-  color: #666;
-  font-size: 13px;
-  margin-bottom: 2px;
-  opacity: 0.8;
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #333;
 }
 
 .last-message {
-  color: #888;
+  color: #666;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 180px;
 }
 
 .session-meta {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
-  min-width: 60px;
+  gap: 4px;
 }
 
 .message-time {
   color: #999;
   font-size: 11px;
-  white-space: nowrap;
 }
 
 .unread-badge {
@@ -566,36 +555,12 @@ onUnmounted(() => {
   color: white;
   border-radius: 10px;
   padding: 2px 6px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold;
-  min-width: 16px;
+  min-width: 18px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(220, 53, 69, 0.3);
 }
 
-.status-indicator {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  position: relative;
-}
-
-.status-dot.ai {
-  background-color: #28a745;
-  box-shadow: 0 0 6px rgba(40, 167, 69, 0.4);
-}
-
-.status-dot.human {
-  background-color: #ffc107;
-  box-shadow: 0 0 6px rgba(255, 193, 7, 0.4);
-}
-
-/* 聊天窗口样式 */
 .chat-window {
   flex: 1;
   background: white;
@@ -620,7 +585,6 @@ onUnmounted(() => {
 .placeholder h3 {
   margin-bottom: 8px;
   color: #333;
-  font-size: 18px;
 }
 
 .chat-content {
@@ -635,70 +599,38 @@ onUnmounted(() => {
   background: white;
   display: flex;
   align-items: center;
-  border-radius: 8px 8px 0 0;
 }
 
-.user-info {
+.goods-info {
   display: flex;
   align-items: center;
 }
 
-.user-avatar {
-  width: 44px;
-  height: 44px;
+.goods-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #28a745;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: bold;
   margin-right: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.user-details {
+.goods-details {
   flex: 1;
 }
 
-.user-name {
-  font-weight: 600;
-  font-size: 16px;
-  color: #333;
+.goods-name {
+  font-weight: 500;
   margin-bottom: 4px;
 }
 
-.goods-info {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.session-status {
-  display: flex;
-  align-items: center;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-badge.ai {
-  background-color: #e8f5e8;
+.goods-status {
   color: #28a745;
-  border: 1px solid #c3e6c3;
-}
-
-.status-badge.human {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  font-size: 14px;
 }
 
 .messages {
@@ -719,16 +651,12 @@ onUnmounted(() => {
   flex-direction: row-reverse;
 }
 
-.message.user-message .message-avatar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
 .message.ai-message .message-avatar {
-  background: linear-gradient(135deg, #17a2b8 0%, #03c4eb 100%);
+  background-color: #17a2b8;
 }
 
 .message.system-message .message-avatar {
-  background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+  background-color: #ffc107;
   color: #000;
 }
 
@@ -743,55 +671,45 @@ onUnmounted(() => {
   justify-content: center;
   font-size: 14px;
   margin: 0 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .own-avatar {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background-color: #007bff;
 }
 
 .message-content {
   max-width: 60%;
   background: white;
-  padding: 10px 14px;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  position: relative;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .own-message .message-content {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background: #007bff;
   color: white;
 }
 
-.user-message .message-content {
-  background: #e3f2fd;
-  border: 1px solid #bbdefb;
-}
-
 .ai-message .message-content {
-  background: #e8f5e8;
-  border: 1px solid #c8e6c9;
+  background: #17a2b8;
+  color: white;
 }
 
 .system-message .message-content {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  color: #856404;
+  background: #ffc107;
+  color: #000;
 }
 
 .message-text {
-  margin-bottom: 6px;
-  line-height: 1.5;
+  margin-bottom: 4px;
+  line-height: 1.4;
   word-wrap: break-word;
-  font-size: 14px;
 }
 
 .message-time {
-  font-size: 11px;
+  font-size: 12px;
   opacity: 0.7;
   text-align: right;
-  font-weight: 400;
 }
 
 .message-input {
@@ -800,91 +718,40 @@ onUnmounted(() => {
   background: white;
   display: flex;
   gap: 12px;
-  border-radius: 0 0 8px 8px;
 }
 
 .message-input input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 24px;
   outline: none;
-  font-size: 14px;
-  transition: border-color 0.2s;
 }
 
 .message-input input:focus {
   border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .message-input input:disabled {
   background: #f8f9fa;
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .message-input button {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 24px;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
 .message-input button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  background-color: #0056b3;
 }
 
 .message-input button:disabled {
-  background: #6c757d;
+  background-color: #6c757d;
   cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.take-over-btn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2) !important;
-}
-
-.take-over-btn:hover:not(:disabled) {
-  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
-}
-
-/* 空状态样式 */
-.empty-sessions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: #666;
-}
-
-.empty-icon {
-  font-size: 64px;
-  margin-bottom: 16px;
-  opacity: 0.3;
-}
-
-.empty-sessions h4 {
-  margin: 0 0 8px 0;
-  color: #333;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.empty-sessions p {
-  margin: 0;
-  font-size: 14px;
-  text-align: center;
-  max-width: 200px;
 }
 </style>

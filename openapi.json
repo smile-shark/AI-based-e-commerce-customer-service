@@ -1,0 +1,1496 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "API Documentation",
+    "version" : "1.0"
+  },
+  "paths" : {
+    "/role/add" : {
+      "post" : {
+        "summary" : "添加AI角色",
+        "description" : "添加AI角色",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "角色的id"
+                  },
+                  "roleName" : {
+                    "type" : "string",
+                    "description" : "角色名称"
+                  },
+                  "roleDescription" : {
+                    "type" : "string",
+                    "description" : "角色描述"
+                  },
+                  "greetingMessage" : {
+                    "type" : "string",
+                    "description" : "问候语"
+                  },
+                  "problemSolvingApproach" : {
+                    "type" : "string",
+                    "description" : "解决问题的方法"
+                  },
+                  "communicationStyle" : {
+                    "type" : "string",
+                    "description" : "沟通风格"
+                  },
+                  "responseTone" : {
+                    "type" : "string",
+                    "description" : "回复语调"
+                  },
+                  "productKnowledgeLevel" : {
+                    "type" : "string",
+                    "description" : "产品知识水平"
+                  },
+                  "emotionalIntelligence" : {
+                    "type" : "string",
+                    "description" : "情商表现"
+                  },
+                  "escalationCriteria" : {
+                    "type" : "string",
+                    "description" : "升级处理标准"
+                  },
+                  "closingMessage" : {
+                    "type" : "string",
+                    "description" : "结束语"
+                  },
+                  "createdAt" : {
+                    "type" : "string",
+                    "description" : "创建时间"
+                  },
+                  "updatedAt" : {
+                    "type" : "string",
+                    "description" : "更新时间"
+                  },
+                  "ctId" : {
+                    "type" : "integer",
+                    "description" : "关联的商户，每个商户有一个客户的角色"
+                  }
+                },
+                "description" : "角色信息"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Result 操作结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "Result 操作结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/delete" : {
+      "delete" : {
+        "summary" : "删除AI角色",
+        "description" : "删除AI角色",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "角色id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Result 操作结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "Result 操作结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/update" : {
+      "post" : {
+        "summary" : "修改AI角色",
+        "description" : "修改AI角色",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "角色的id"
+                  },
+                  "roleName" : {
+                    "type" : "string",
+                    "description" : "角色名称"
+                  },
+                  "roleDescription" : {
+                    "type" : "string",
+                    "description" : "角色描述"
+                  },
+                  "greetingMessage" : {
+                    "type" : "string",
+                    "description" : "问候语"
+                  },
+                  "problemSolvingApproach" : {
+                    "type" : "string",
+                    "description" : "解决问题的方法"
+                  },
+                  "communicationStyle" : {
+                    "type" : "string",
+                    "description" : "沟通风格"
+                  },
+                  "responseTone" : {
+                    "type" : "string",
+                    "description" : "回复语调"
+                  },
+                  "productKnowledgeLevel" : {
+                    "type" : "string",
+                    "description" : "产品知识水平"
+                  },
+                  "emotionalIntelligence" : {
+                    "type" : "string",
+                    "description" : "情商表现"
+                  },
+                  "escalationCriteria" : {
+                    "type" : "string",
+                    "description" : "升级处理标准"
+                  },
+                  "closingMessage" : {
+                    "type" : "string",
+                    "description" : "结束语"
+                  },
+                  "createdAt" : {
+                    "type" : "string",
+                    "description" : "创建时间"
+                  },
+                  "updatedAt" : {
+                    "type" : "string",
+                    "description" : "更新时间"
+                  },
+                  "ctId" : {
+                    "type" : "integer",
+                    "description" : "关联的商户，每个商户有一个客户的角色"
+                  }
+                },
+                "description" : "角色信息"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Result 操作结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "Result 操作结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/role/detailsByCtId" : {
+      "get" : {
+        "summary" : "直接查询店铺AI的详细信息",
+        "description" : "直接查询店铺AI的详细信息",
+        "parameters" : [ {
+          "name" : "ctId",
+          "in" : "query",
+          "description" : "商户id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "角色信息",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "角色信息"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login" : {
+      "post" : {
+        "summary" : "login",
+        "description" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "客户id"
+                  },
+                  "name" : {
+                    "type" : "string",
+                    "description" : "客户名称"
+                  },
+                  "account" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "password" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goods/add" : {
+      "post" : {
+        "summary" : "添加商品",
+        "description" : "添加商品",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "商品id自增列"
+                  },
+                  "name" : {
+                    "type" : "string",
+                    "description" : "商品名称"
+                  },
+                  "ctId" : {
+                    "type" : "integer",
+                    "description" : "关联的商户"
+                  },
+                  "documents" : {
+                    "type" : "array",
+                    "description" : "",
+                    "items" : {
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "文档id，用户向量检索时筛选"
+                        },
+                        "name" : {
+                          "type" : "string",
+                          "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+                        },
+                        "goodsId" : {
+                          "type" : "integer",
+                          "description" : "关联的商品"
+                        }
+                      },
+                      "description" : "商品文档实体类"
+                    }
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "对应的商品id",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "对应的商品id"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goods/delete" : {
+      "delete" : {
+        "summary" : "删除商品",
+        "description" : "删除商品",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "删除结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "删除结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goods/update" : {
+      "put" : {
+        "summary" : "修改商品数据",
+        "description" : "修改商品数据",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "商品id自增列"
+                  },
+                  "name" : {
+                    "type" : "string",
+                    "description" : "商品名称"
+                  },
+                  "ctId" : {
+                    "type" : "integer",
+                    "description" : "关联的商户"
+                  },
+                  "documents" : {
+                    "type" : "array",
+                    "description" : "",
+                    "items" : {
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "文档id，用户向量检索时筛选"
+                        },
+                        "name" : {
+                          "type" : "string",
+                          "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+                        },
+                        "goodsId" : {
+                          "type" : "integer",
+                          "description" : "关联的商品"
+                        }
+                      },
+                      "description" : "商品文档实体类"
+                    }
+                  }
+                },
+                "description" : "需要修改的商品数据"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "修改结果 true/false",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "boolean",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "修改结果 true/false"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goods/detailById" : {
+      "get" : {
+        "summary" : "根据id查询商品的详细数据",
+        "description" : "根据id查询商品的详细数据",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "商品id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "商品数据",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "id" : {
+                          "type" : "integer",
+                          "description" : "商品id自增列"
+                        },
+                        "name" : {
+                          "type" : "string",
+                          "description" : "商品名称"
+                        },
+                        "ctId" : {
+                          "type" : "integer",
+                          "description" : "关联的商户"
+                        },
+                        "documents" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "id" : {
+                                "type" : "integer",
+                                "description" : "文档id，用户向量检索时筛选"
+                              },
+                              "name" : {
+                                "type" : "string",
+                                "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+                              },
+                              "goodsId" : {
+                                "type" : "integer",
+                                "description" : "关联的商品"
+                              }
+                            },
+                            "description" : "商品文档实体类"
+                          }
+                        }
+                      },
+                      "description" : ""
+                    }
+                  },
+                  "description" : "商品数据"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goods/pageInfo" : {
+      "get" : {
+        "summary" : "分页查询商品数据",
+        "description" : "分页查询商品数据",
+        "parameters" : [ {
+          "name" : "pageNum",
+          "in" : "query",
+          "description" : "页码",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "pageSize",
+          "in" : "query",
+          "description" : "每页数量",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "商品数据",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "object",
+                      "properties" : {
+                        "records" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "id" : {
+                                "type" : "integer",
+                                "description" : "商品id自增列"
+                              },
+                              "name" : {
+                                "type" : "string",
+                                "description" : "商品名称"
+                              },
+                              "ctId" : {
+                                "type" : "integer",
+                                "description" : "关联的商户"
+                              },
+                              "documents" : {
+                                "type" : "array",
+                                "description" : "",
+                                "items" : {
+                                  "type" : "object",
+                                  "properties" : {
+                                    "id" : {
+                                      "type" : "integer",
+                                      "description" : "文档id，用户向量检索时筛选"
+                                    },
+                                    "name" : {
+                                      "type" : "string",
+                                      "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+                                    },
+                                    "goodsId" : {
+                                      "type" : "integer",
+                                      "description" : "关联的商品"
+                                    }
+                                  },
+                                  "description" : "商品文档实体类"
+                                }
+                              }
+                            },
+                            "description" : "商品实体类"
+                          }
+                        },
+                        "total" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "size" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "current" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "orders" : {
+                          "type" : "array",
+                          "description" : "",
+                          "items" : {
+                            "type" : "object",
+                            "properties" : {
+                              "column" : {
+                                "type" : "string",
+                                "description" : ""
+                              },
+                              "asc" : {
+                                "type" : "boolean",
+                                "description" : ""
+                              }
+                            },
+                            "description" : "com.baomidou.mybatisplus.core.metadata.OrderItem"
+                          }
+                        },
+                        "optimizeCountSql" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        },
+                        "searchCount" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        },
+                        "optimizeJoinOfCountSql" : {
+                          "type" : "boolean",
+                          "description" : ""
+                        },
+                        "maxLimit" : {
+                          "type" : "integer",
+                          "description" : "",
+                          "format" : "int64"
+                        },
+                        "countId" : {
+                          "type" : "string",
+                          "description" : ""
+                        }
+                      },
+                      "description" : ""
+                    }
+                  },
+                  "description" : "商品数据"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/session/userGetLastSessionList" : {
+      "get" : {
+        "summary" : "用户获取到会话列表，其中会以时间倒序排序",
+        "description" : "用户获取到会话列表，其中会以时间倒序排序",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "query",
+          "description" : "用户id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "会话列表",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "integer",
+                            "description" : "会话id"
+                          },
+                          "ctId" : {
+                            "type" : "integer",
+                            "description" : "关联的商户"
+                          },
+                          "userId" : {
+                            "type" : "integer",
+                            "description" : "关联的客户"
+                          },
+                          "goodsId" : {
+                            "type" : "integer",
+                            "description" : "关联的商品，RAG会根据这个取查询对应商品的知识"
+                          },
+                          "conversationStatus" : {
+                            "type" : "string",
+                            "description" : "{AI=AI, HUMAN=HUMAN}",
+                            "enum" : [ "AI", "HUMAN" ]
+                          },
+                          "timestamp" : {
+                            "type" : "string",
+                            "description" : ""
+                          }
+                        },
+                        "description" : "会话实体类，一个商家和客户的会话id"
+                      }
+                    }
+                  },
+                  "description" : "会话列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/session/ctGetLastSessionList" : {
+      "get" : {
+        "summary" : "商户获取到会话列表，其中会以时间倒序排序",
+        "description" : "商户获取到会话列表，其中会以时间倒序排序",
+        "parameters" : [ {
+          "name" : "ctId",
+          "in" : "query",
+          "description" : "商家id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "会话列表",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "integer",
+                            "description" : "会话id"
+                          },
+                          "ctId" : {
+                            "type" : "integer",
+                            "description" : "关联的商户"
+                          },
+                          "userId" : {
+                            "type" : "integer",
+                            "description" : "关联的客户"
+                          },
+                          "goodsId" : {
+                            "type" : "integer",
+                            "description" : "关联的商品，RAG会根据这个取查询对应商品的知识"
+                          },
+                          "conversationStatus" : {
+                            "type" : "string",
+                            "description" : "{AI=AI, HUMAN=HUMAN}",
+                            "enum" : [ "AI", "HUMAN" ]
+                          },
+                          "timestamp" : {
+                            "type" : "string",
+                            "description" : ""
+                          }
+                        },
+                        "description" : "会话实体类，一个商家和客户的会话id"
+                      }
+                    }
+                  },
+                  "description" : "会话列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessionLog/readCtMessage" : {
+      "put" : {
+        "summary" : "修改消息的状态为已读",
+        "description" : "修改消息的状态为已读",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "会话id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "userId",
+          "in" : "query",
+          "description" : "用户id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "修改结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "修改结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessionLog/readUserMessage" : {
+      "put" : {
+        "summary" : "readUserMessage",
+        "description" : "readUserMessage",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        }, {
+          "name" : "ctId",
+          "in" : "query",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessionLog/getWindowMessage" : {
+      "get" : {
+        "summary" : "获取会话窗口中的消息，以时间 顺序排序",
+        "description" : "获取会话窗口中的消息，以时间 顺序排序",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "会话id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "消息列表",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "array",
+                      "description" : "",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "integer",
+                            "description" : "记录的id"
+                          },
+                          "content" : {
+                            "type" : "string",
+                            "description" : "对话的内容"
+                          },
+                          "type" : {
+                            "type" : "string",
+                            "description" : "{USER=USER, ASSISTANT=ASSISTANT, SYSTEM=SYSTEM, TOOL=TOOL, COMMERCIAL_TENANT=COMMERCIAL_TENANT}",
+                            "enum" : [ "USER", "ASSISTANT", "SYSTEM", "TOOL", "COMMERCIAL_TENANT" ]
+                          },
+                          "timestamp" : {
+                            "type" : "string",
+                            "description" : "记录创建的时间"
+                          },
+                          "sessionId" : {
+                            "type" : "integer",
+                            "description" : "关联的会话"
+                          },
+                          "readStatus" : {
+                            "type" : "string",
+                            "description" : "{READ=READ, UNREAD=UNREAD}",
+                            "enum" : [ "READ", "UNREAD" ]
+                          }
+                        },
+                        "description" : "会话记录实体类"
+                      }
+                    }
+                  },
+                  "description" : "消息列表"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessionLog/userGetUnreadMessageCount" : {
+      "get" : {
+        "summary" : "用户获取该session的未读消息数量",
+        "description" : "用户获取该session的未读消息数量",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "会话id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "未读消息数量",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "integer",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "未读消息数量"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessionLog/ctGetUnreadMessageCount" : {
+      "get" : {
+        "summary" : "商户获取该session的未读消息数量",
+        "description" : "商户获取该session的未读消息数量",
+        "parameters" : [ {
+          "name" : "sessionId",
+          "in" : "query",
+          "description" : "会话id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "未读消息数量",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "integer",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "未读消息数量"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodsDocument/upload" : {
+      "post" : {
+        "summary" : "文档上传",
+        "description" : "文档上传",
+        "parameters" : [ {
+          "name" : "goodsId",
+          "in" : "query",
+          "description" : "商品id",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "string",
+                "description" : "文档"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "上传结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "上传结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/goodsDocument/delete" : {
+      "delete" : {
+        "summary" : "删除 文档",
+        "description" : "删除 文档",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "文档id",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "nullable" : false
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "删除结果",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  },
+                  "description" : "删除结果"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/commercialTenant/login" : {
+      "post" : {
+        "summary" : "login",
+        "description" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "integer",
+                    "description" : "商户id"
+                  },
+                  "name" : {
+                    "type" : "string",
+                    "description" : "商户名称"
+                  },
+                  "account" : {
+                    "type" : "string",
+                    "description" : ""
+                  },
+                  "password" : {
+                    "type" : "string",
+                    "description" : ""
+                  }
+                },
+                "description" : ""
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "integer",
+                      "description" : ""
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "description" : ""
+                    },
+                    "data" : {
+                      "type" : "string",
+                      "description" : ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "商品文档实体类" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "文档id，用户向量检索时筛选"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+          },
+          "goodsId" : {
+            "type" : "integer",
+            "description" : "关联的商品"
+          }
+        },
+        "description" : "商品文档实体类"
+      },
+      "商品实体类" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "商品id自增列"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "商品名称"
+          },
+          "ctId" : {
+            "type" : "integer",
+            "description" : "关联的商户"
+          },
+          "documents" : {
+            "type" : "array",
+            "description" : "",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "id" : {
+                  "type" : "integer",
+                  "description" : "文档id，用户向量检索时筛选"
+                },
+                "name" : {
+                  "type" : "string",
+                  "description" : "文档的名称，用于查看对应商品下面有哪些文档"
+                },
+                "goodsId" : {
+                  "type" : "integer",
+                  "description" : "关联的商品"
+                }
+              },
+              "description" : "商品文档实体类"
+            }
+          }
+        },
+        "description" : "商品实体类"
+      },
+      "com.baomidou.mybatisplus.core.metadata.OrderItem" : {
+        "type" : "object",
+        "properties" : {
+          "column" : {
+            "type" : "string",
+            "description" : ""
+          },
+          "asc" : {
+            "type" : "boolean",
+            "description" : ""
+          }
+        },
+        "description" : "com.baomidou.mybatisplus.core.metadata.OrderItem"
+      },
+      "会话实体类，一个商家和客户的会话id" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "会话id"
+          },
+          "ctId" : {
+            "type" : "integer",
+            "description" : "关联的商户"
+          },
+          "userId" : {
+            "type" : "integer",
+            "description" : "关联的客户"
+          },
+          "goodsId" : {
+            "type" : "integer",
+            "description" : "关联的商品，RAG会根据这个取查询对应商品的知识"
+          },
+          "conversationStatus" : {
+            "type" : "string",
+            "description" : "{AI=AI, HUMAN=HUMAN}",
+            "enum" : [ "AI", "HUMAN" ]
+          },
+          "timestamp" : {
+            "type" : "string",
+            "description" : ""
+          }
+        },
+        "description" : "会话实体类，一个商家和客户的会话id"
+      },
+      "会话记录实体类" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "description" : "记录的id"
+          },
+          "content" : {
+            "type" : "string",
+            "description" : "对话的内容"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "{USER=USER, ASSISTANT=ASSISTANT, SYSTEM=SYSTEM, TOOL=TOOL, COMMERCIAL_TENANT=COMMERCIAL_TENANT}",
+            "enum" : [ "USER", "ASSISTANT", "SYSTEM", "TOOL", "COMMERCIAL_TENANT" ]
+          },
+          "timestamp" : {
+            "type" : "string",
+            "description" : "记录创建的时间"
+          },
+          "sessionId" : {
+            "type" : "integer",
+            "description" : "关联的会话"
+          },
+          "readStatus" : {
+            "type" : "string",
+            "description" : "{READ=READ, UNREAD=UNREAD}",
+            "enum" : [ "READ", "UNREAD" ]
+          }
+        },
+        "description" : "会话记录实体类"
+      }
+    }
+  }
+}

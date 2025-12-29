@@ -1,5 +1,6 @@
 package com.smileshark.websocket.endpoint;
 
+import com.smileshark.config.ChatMessageCoder;
 import com.smileshark.entity.SessionLog;
 import com.smileshark.mapper.SessionLogMapper;
 import com.smileshark.utils.SessionFind;
@@ -8,19 +9,24 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
-
 @Component
-@ServerEndpoint("/commercialTenant/chat/{ctId}")
-@RequiredArgsConstructor
+@ServerEndpoint(value = "/commercialTenant/chat/{ctId}",decoders = ChatMessageCoder.class, encoders = ChatMessageCoder.class)
 public class CommercialTenantEndpoint implements WebSocketEndpoint {
     private static final ConcurrentHashMap<Integer, CommercialTenantEndpoint> commercialTenantEndpointConcurrentEndpointPool = new ConcurrentHashMap<>();
-    private final SessionLogMapper sessionLogMapper;
-    private final SessionFind sessionFind;
+    private static SessionLogMapper sessionLogMapper;
+    private static SessionFind sessionFind;
+    @Autowired
+    public void setDependencies(SessionLogMapper sessionLogMapper, SessionFind sessionFind) {
+        CommercialTenantEndpoint.sessionLogMapper = sessionLogMapper;
+        CommercialTenantEndpoint.sessionFind = sessionFind;
+    }
 
     private Session session;
     private Integer ctId;
@@ -40,7 +46,6 @@ public class CommercialTenantEndpoint implements WebSocketEndpoint {
     }
 
     @OnMessage
-    @Transactional
     public void onMessage(ChatMessage message, Session session) throws EncodeException, IOException {
         message.setType(getEndpointType());
         // 将消息存入数据库中
@@ -59,9 +64,12 @@ public class CommercialTenantEndpoint implements WebSocketEndpoint {
     @OnError
     public void onError(Session session, Throwable error) {
         try {
+            error.printStackTrace();
             session.getBasicRemote().sendObject(ChatMessage.builder()
                     .state(ChatMessage.State.ERROR)
-                    .message(error.getMessage()));
+                    .message(error.getMessage())
+                    .build()
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }

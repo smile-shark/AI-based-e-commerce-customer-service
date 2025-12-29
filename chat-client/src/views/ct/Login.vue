@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ctApi from '../../api/ctApi'
 import { setCtInfo } from '../../utils/storage'
+import { getCtWebSocketClient } from '../../utils/websocket'
 
 const router = useRouter()
 const account = ref('')
@@ -29,6 +30,17 @@ const handleLogin = async () => {
       // 登录成功，存储商户信息并跳转到商户主页
       if (response.data) {
         setCtInfo(response.data)
+        // 同时存储商户ID用于API调用
+        localStorage.setItem('ctId', response.data.id.toString())
+
+        // 建立WebSocket连接
+        try {
+          const wsClient = getCtWebSocketClient(response.data.id)
+          await wsClient.connect()
+          console.log('CT WebSocket connected after login')
+        } catch (wsError) {
+          console.error('Failed to establish WebSocket connection:', wsError)
+        }
       }
       router.push('/ct/home')
     } else {

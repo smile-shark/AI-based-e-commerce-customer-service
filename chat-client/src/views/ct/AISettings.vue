@@ -79,58 +79,76 @@
     <div v-if="showAddModal" class="modal-overlay" @click="showAddModal = false">
       <div class="modal-content" @click.stop>
         <h3>添加AI客服</h3>
-        <form @submit.prevent="addAIRole">
-          <div class="form-row">
+        <form @submit.prevent="addAIRole" class="ai-form">
+          <!-- 基本信息 -->
+          <div class="form-section">
+            <h4>基本信息</h4>
             <div class="form-group">
               <label>角色名称：</label>
-              <input v-model="aiForm.roleName" type="text" required>
+              <input v-model="aiForm.roleName" type="text" placeholder="例如：专业客服助手" required>
             </div>
             <div class="form-group">
               <label>问候语：</label>
-              <input v-model="aiForm.greetingMessage" type="text" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>角色描述：</label>
-            <textarea v-model="aiForm.roleDescription" required></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>解决问题的方法：</label>
-              <input v-model="aiForm.problemSolvingApproach" type="text" required>
+              <input v-model="aiForm.greetingMessage" type="text" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required>
             </div>
             <div class="form-group">
-              <label>沟通风格：</label>
-              <input v-model="aiForm.communicationStyle" type="text" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>回复语调：</label>
-              <input v-model="aiForm.responseTone" type="text" required>
+              <label>角色描述：</label>
+              <textarea v-model="aiForm.roleDescription" placeholder="详细描述AI客服的角色定位和职责" required></textarea>
             </div>
             <div class="form-group">
-              <label>产品知识水平：</label>
-              <input v-model="aiForm.productKnowledgeLevel" type="text" required>
+              <label>结束语：</label>
+              <input v-model="aiForm.closingMessage" type="text" placeholder="例如：感谢您的咨询，祝您购物愉快！" required>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>情商表现：</label>
-              <input v-model="aiForm.emotionalIntelligence" type="text" required>
-            </div>
-            <div class="form-group">
-              <label>升级处理标准：</label>
-              <input v-model="aiForm.escalationCriteria" type="text" required>
+
+          <!-- 工作方式 -->
+          <div class="form-section">
+            <h4>工作方式</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>解决问题的方法：</label>
+                <input v-model="aiForm.problemSolvingApproach" type="text" placeholder="例如：耐心倾听，快速响应，提供解决方案" required>
+              </div>
+              <div class="form-group">
+                <label>沟通风格：</label>
+                <input v-model="aiForm.communicationStyle" type="text" placeholder="例如：友好、专业、耐心" required>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-            <label>结束语：</label>
-            <input v-model="aiForm.closingMessage" type="text" required>
+
+          <!-- 表达方式 -->
+          <div class="form-section">
+            <h4>表达方式</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>回复语调：</label>
+                <input v-model="aiForm.responseTone" type="text" placeholder="例如：温和、坚定、亲切" required>
+              </div>
+              <div class="form-group">
+                <label>产品知识水平：</label>
+                <input v-model="aiForm.productKnowledgeLevel" type="text" placeholder="例如：专家级、熟练、基础" required>
+              </div>
+            </div>
           </div>
+
+          <!-- 高级设置 -->
+          <div class="form-section">
+            <h4>高级设置</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>情商表现：</label>
+                <input v-model="aiForm.emotionalIntelligence" type="text" placeholder="例如：高情商，能够理解用户情绪" required>
+              </div>
+              <div class="form-group">
+                <label>升级处理标准：</label>
+                <input v-model="aiForm.escalationCriteria" type="text" placeholder="例如：用户情绪激动、技术问题复杂" required>
+              </div>
+            </div>
+          </div>
+
           <div class="modal-actions">
             <button type="button" @click="showAddModal = false">取消</button>
-            <button type="submit" :disabled="loading">添加</button>
+            <button type="submit" :disabled="loading">添加AI客服</button>
           </div>
         </form>
       </div>
@@ -140,58 +158,76 @@
     <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
       <div class="modal-content" @click.stop>
         <h3>编辑AI客服</h3>
-        <form @submit.prevent="updateAIRole">
-          <div class="form-row">
+        <form @submit.prevent="updateAIRole" class="ai-form">
+          <!-- 基本信息 -->
+          <div class="form-section">
+            <h4>基本信息</h4>
             <div class="form-group">
               <label>角色名称：</label>
-              <input v-model="editForm.roleName" type="text" required>
+              <input v-model="editForm.roleName" type="text" placeholder="例如：专业客服助手" required>
             </div>
             <div class="form-group">
               <label>问候语：</label>
-              <input v-model="editForm.greetingMessage" type="text" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>角色描述：</label>
-            <textarea v-model="editForm.roleDescription" required></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>解决问题的方法：</label>
-              <input v-model="editForm.problemSolvingApproach" type="text" required>
+              <input v-model="editForm.greetingMessage" type="text" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required>
             </div>
             <div class="form-group">
-              <label>沟通风格：</label>
-              <input v-model="editForm.communicationStyle" type="text" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>回复语调：</label>
-              <input v-model="editForm.responseTone" type="text" required>
+              <label>角色描述：</label>
+              <textarea v-model="editForm.roleDescription" placeholder="详细描述AI客服的角色定位和职责" required></textarea>
             </div>
             <div class="form-group">
-              <label>产品知识水平：</label>
-              <input v-model="editForm.productKnowledgeLevel" type="text" required>
+              <label>结束语：</label>
+              <input v-model="editForm.closingMessage" type="text" placeholder="例如：感谢您的咨询，祝您购物愉快！" required>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>情商表现：</label>
-              <input v-model="editForm.emotionalIntelligence" type="text" required>
-            </div>
-            <div class="form-group">
-              <label>升级处理标准：</label>
-              <input v-model="editForm.escalationCriteria" type="text" required>
+
+          <!-- 工作方式 -->
+          <div class="form-section">
+            <h4>工作方式</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>解决问题的方法：</label>
+                <input v-model="editForm.problemSolvingApproach" type="text" placeholder="例如：耐心倾听，快速响应，提供解决方案" required>
+              </div>
+              <div class="form-group">
+                <label>沟通风格：</label>
+                <input v-model="editForm.communicationStyle" type="text" placeholder="例如：友好、专业、耐心" required>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-            <label>结束语：</label>
-            <input v-model="editForm.closingMessage" type="text" required>
+
+          <!-- 表达方式 -->
+          <div class="form-section">
+            <h4>表达方式</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>回复语调：</label>
+                <input v-model="editForm.responseTone" type="text" placeholder="例如：温和、坚定、亲切" required>
+              </div>
+              <div class="form-group">
+                <label>产品知识水平：</label>
+                <input v-model="editForm.productKnowledgeLevel" type="text" placeholder="例如：专家级、熟练、基础" required>
+              </div>
+            </div>
           </div>
+
+          <!-- 高级设置 -->
+          <div class="form-section">
+            <h4>高级设置</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>情商表现：</label>
+                <input v-model="editForm.emotionalIntelligence" type="text" placeholder="例如：高情商，能够理解用户情绪" required>
+              </div>
+              <div class="form-group">
+                <label>升级处理标准：</label>
+                <input v-model="editForm.escalationCriteria" type="text" placeholder="例如：用户情绪激动、技术问题复杂" required>
+              </div>
+            </div>
+          </div>
+
           <div class="modal-actions">
             <button type="button" @click="showEditModal = false">取消</button>
-            <button type="submit" :disabled="loading">保存</button>
+            <button type="submit" :disabled="loading">保存修改</button>
           </div>
         </form>
       </div>
@@ -493,8 +529,8 @@ onMounted(() => {
 
 .form-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .form-row .form-group {
@@ -502,31 +538,67 @@ onMounted(() => {
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  color: #333;
 }
 
 .form-group input {
   width: 100%;
-  padding: 8px 12px;
+  padding: 12px 16px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
 }
 
 .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 12px 16px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 14px;
-  min-height: 60px;
+  min-height: 80px;
   resize: vertical;
+  transition: border-color 0.3s;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+}
+
+.ai-form {
+  max-width: none;
+}
+
+.form-section {
+  margin-bottom: 32px;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.form-section h4 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 2px solid #409eff;
+  padding-bottom: 8px;
 }
 
 .modal-actions {

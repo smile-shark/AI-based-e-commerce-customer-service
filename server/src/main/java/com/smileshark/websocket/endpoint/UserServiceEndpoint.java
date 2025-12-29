@@ -1,6 +1,7 @@
 package com.smileshark.websocket.endpoint;
 
 import com.smileshark.ai.service.AIService;
+import com.smileshark.config.ChatMessageCoder;
 import com.smileshark.entity.SessionLog;
 import com.smileshark.mapper.SessionLogMapper;
 import com.smileshark.service.SessionService;
@@ -10,21 +11,35 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint("/user/chat/{userId}")
-@RequiredArgsConstructor
+@ServerEndpoint(value = "/user/chat/{userId}", decoders = ChatMessageCoder.class, encoders = ChatMessageCoder.class)
 public class UserServiceEndpoint implements WebSocketEndpoint {
     private static final ConcurrentHashMap<Integer, UserServiceEndpoint> userEndpointPool = new ConcurrentHashMap<>();
-    private final SessionLogMapper sessionLogMapper;
-    private final SessionFind sessionFind;
-    private final SessionService sessionService;
-    private final AIService aiService;
+
+    // --- 1. 所有的 Service 必须声明为 static ---
+    private static SessionLogMapper sessionLogMapper;
+    private static SessionFind sessionFind;
+    private static SessionService sessionService;
+    private static AIService aiService;
+
+    // --- 2. 通过非静态 Setter 方法进行注入 ---
+    // Spring 启动时会创建一个该类的单例，并调用此方法给静态变量赋值
+    @Autowired
+    public void setDependencies(SessionLogMapper sessionLogMapper, SessionFind sessionFind,
+                                SessionService sessionService, AIService aiService) {
+        UserServiceEndpoint.sessionLogMapper = sessionLogMapper;
+        UserServiceEndpoint.sessionFind = sessionFind;
+        UserServiceEndpoint.sessionService = sessionService;
+        UserServiceEndpoint.aiService = aiService;
+    }
 
     private Session session;
     private Integer userId;
@@ -44,17 +59,10 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
     }
 
     @OnMessage
-    @Transactional
     public void onMessage(ChatMessage message, Session session) throws EncodeException, IOException, IllegalAccessException {
         message.setType(getEndpointType());
         // 判断是否有对应的sessionId如果没有就表示是第一次聊天
-        com.smileshark.entity.Session chatSession = sessionService.find(message, userId);
-        // 将消息存入数据库中
-        sessionLogMapper.insert(SessionLog.builder()
-                .type(message.getType())
-                .sessionId(message.getSessionId())
-                .content(message.getMessage())
-                .build());
+        com.smileshark.entity.Session chatSession = sessionService.find(message, userId, this);
         // 判断session的类型
         switch (chatSession.getConversationStatus()) {
             case AI -> {
@@ -63,6 +71,12 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
                     // 背AI判定为需要转人工
                     CommercialTenantEndpoint ctEndPoint = sessionFind.findCommercialTenantEndPoint(message.getSessionId());
                     if (ctEndPoint != null) {
+                        // 将消息存入数据库中
+                        sessionLogMapper.insert(SessionLog.builder()
+                                .type(message.getType())
+                                .sessionId(message.getSessionId())
+                                .content(message.getMessage())
+                                .build());
                         ctEndPoint.sendMessage(message);
                     }
                 } else {
@@ -70,6 +84,12 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
                 }
             }
             case HUMAN -> {
+                // 将消息存入数据库中，只有人工的需要手动存储，这里是不需要经过redis的
+                sessionLogMapper.insert(SessionLog.builder()
+                        .type(message.getType())
+                        .sessionId(message.getSessionId())
+                        .content(message.getMessage())
+                        .build());
                 // 通过message中的sessionId找到对应的商户会话
                 CommercialTenantEndpoint ctEndPoint = sessionFind.findCommercialTenantEndPoint(message.getSessionId());
                 if (ctEndPoint != null) {
@@ -82,9 +102,11 @@ public class UserServiceEndpoint implements WebSocketEndpoint {
     @OnError
     public void onError(Session session, Throwable error) {
         try {
+            error.printStackTrace();
             session.getBasicRemote().sendObject(ChatMessage.builder()
                     .state(ChatMessage.State.ERROR)
-                    .message(error.getMessage()));
+                    .message(error.getMessage())
+                    .build());
         } catch (Exception e) {
             e.printStackTrace();
         }

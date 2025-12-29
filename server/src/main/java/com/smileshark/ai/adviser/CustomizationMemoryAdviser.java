@@ -2,14 +2,18 @@ package com.smileshark.ai.adviser;
 
 import com.smileshark.ai.memory.CustomizationMemory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClientMessageAggregator;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ public class CustomizationMemoryAdviser implements BaseChatMemoryAdvisor {
     private final CustomizationMemory customizationMemory;
     private final PromptTemplate systemPromptTemplate = new PromptTemplate("{instructions}\n\nUse the conversation memory from the MEMORY section to provide accurate answers.\n\n---------------------\nMEMORY:\n{memory}\n---------------------\n\n");
     private final static String defaultConversationId = "default";
+
 
     /**
      * 发送前的操作：
@@ -65,8 +70,8 @@ public class CustomizationMemoryAdviser implements BaseChatMemoryAdvisor {
         ChatClientRequest processedChatClientRequest = chatClientRequest.mutate()
                 .prompt(chatClientRequest.prompt().augmentSystemMessage(augmentedSystemText))
                 .build();
-        // 提取用户的消息进行存储
-        UserMessage userMessage = processedChatClientRequest.prompt().getUserMessage();
+        // 提取用户的消息进行存储 -- 这里不需要
+        UserMessage userMessage = chatClientRequest.prompt().getUserMessage();
         this.customizationMemory.add(conversationId, userMessage);
         // 将新的记忆进行返回
         return processedChatClientRequest;
@@ -84,10 +89,29 @@ public class CustomizationMemoryAdviser implements BaseChatMemoryAdvisor {
         if (chatResponse == null) {
             throw new RuntimeException("AI返回的消息为空");
         }
-        AssistantMessage assistantMessage = chatResponse.getResult().getOutput();
+        StringBuilder content = new StringBuilder();
+        for (Generation result : chatResponse.getResults()) {
+            content.append(result.getOutput().getText());
+        }
+        AssistantMessage assistantMessage = new AssistantMessage(content.toString());
         // 将AI返回的消息存储到本地
         this.customizationMemory.add(conversationId, assistantMessage);
         return chatClientResponse;
+    }
+
+    @Override
+    public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest, StreamAdvisorChain streamAdvisorChain) {
+        // 先执行 before（添加用户消息等）
+        ChatClientRequest processedRequest = this.before(chatClientRequest, streamAdvisorChain);
+        // 继续下游流式调用
+        Flux<ChatClientResponse> streamedResponses = streamAdvisorChain.nextStream(processedRequest);
+        return new ChatClientMessageAggregator().aggregateChatClientResponse(
+                streamedResponses,
+                aggregatedResponse -> {
+                    // 只在整个流结束、内容完整时调用一次 after()
+                    this.after(aggregatedResponse, streamAdvisorChain);
+                }
+        );
     }
 
     @Override

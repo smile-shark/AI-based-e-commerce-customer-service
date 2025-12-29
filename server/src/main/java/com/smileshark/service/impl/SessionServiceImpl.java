@@ -11,7 +11,9 @@ import com.smileshark.service.RoleService;
 import com.smileshark.service.SessionService;
 import com.smileshark.utils.KeyUtils;
 import com.smileshark.utils.SessionFind;
+import com.smileshark.websocket.endpoint.UserServiceEndpoint;
 import com.smileshark.websocket.message.ChatMessage;
+import jakarta.websocket.EncodeException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +38,7 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
 
     @Override
     @Transactional
-    public Session find(ChatMessage message, Integer userId) {
+    public Session find(ChatMessage message, Integer userId, UserServiceEndpoint userServiceEndpoint) throws EncodeException, IOException {
         // 首先判断是否有session
         if (!ObjectUtils.isEmpty(message.getSessionId())) {
             // 如果不是空的就直接返回
@@ -56,12 +59,21 @@ public class SessionServiceImpl extends ServiceImpl<SessionMapper, Session> impl
         if (role == null) {
             // 没有AI客服就设置为人工会话
             sessionBuilder.conversationStatus(Session.ConversationStatus.HUMAN);
+        }else{
+            // 这里需要手动设置类型，不然序列化到redis中的数据会没有这个类型
+            sessionBuilder.conversationStatus(Session.ConversationStatus.AI);
         }
         // 保存会话到数据库
         Session session = sessionBuilder.build();
         save(session);
         // 保存会话到redis
         stringRedisTemplate.opsForValue().set(KeyUtils.redisKeyUtils(key, session.getId()), JSONUtil.toJsonStr(session), timeout, TimeUnit.MINUTES);
+        // 将session的部分信息返回给前端
+        userServiceEndpoint.sendMessage(ChatMessage.builder()
+                .sessionId(session.getId())
+                .state(ChatMessage.State.SURE)
+                .build()
+        );
         return session;
     }
 
