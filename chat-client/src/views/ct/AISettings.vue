@@ -58,21 +58,7 @@
         </div>
       </div>
 
-      <div class="ai-prompt-preview">
-        <h3>AI角色提示词预览</h3>
-        <div class="prompt-content">
-          你是一个专业的{{ aiRole.roleName }}。你的主要职责是：
-          角色描述：{{ aiRole.roleDescription }}
-          问候语：{{ aiRole.greetingMessage }}
-          解决问题的方法：{{ aiRole.problemSolvingApproach }}
-          沟通风格：{{ aiRole.communicationStyle }}
-          回复语调：{{ aiRole.responseTone }}
-          产品知识水平：{{ aiRole.productKnowledgeLevel }}
-          情商表现：{{ aiRole.emotionalIntelligence }}
-          升级处理标准：{{ aiRole.escalationCriteria }}
-          结束语：{{ aiRole.closingMessage }}
-        </div>
-      </div>
+
     </div>
 
     <!-- 添加AI模态框 -->
@@ -89,7 +75,7 @@
             </div>
             <div class="form-group">
               <label>问候语：</label>
-              <input v-model="aiForm.greetingMessage" type="text" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required>
+              <textarea v-model="aiForm.greetingMessage" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required></textarea>
             </div>
             <div class="form-group">
               <label>角色描述：</label>
@@ -97,7 +83,7 @@
             </div>
             <div class="form-group">
               <label>结束语：</label>
-              <input v-model="aiForm.closingMessage" type="text" placeholder="例如：感谢您的咨询，祝您购物愉快！" required>
+              <textarea v-model="aiForm.closingMessage" placeholder="例如：感谢您的咨询，祝您购物愉快！" required></textarea>
             </div>
           </div>
 
@@ -107,11 +93,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>解决问题的方法：</label>
-                <input v-model="aiForm.problemSolvingApproach" type="text" placeholder="例如：耐心倾听，快速响应，提供解决方案" required>
+                <textarea v-model="aiForm.problemSolvingApproach" placeholder="例如：耐心倾听，快速响应，提供解决方案" required></textarea>
               </div>
               <div class="form-group">
                 <label>沟通风格：</label>
-                <input v-model="aiForm.communicationStyle" type="text" placeholder="例如：友好、专业、耐心" required>
+                <textarea v-model="aiForm.communicationStyle" placeholder="例如：友好、专业、耐心" required></textarea>
               </div>
             </div>
           </div>
@@ -122,11 +108,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>回复语调：</label>
-                <input v-model="aiForm.responseTone" type="text" placeholder="例如：温和、坚定、亲切" required>
+                <textarea v-model="aiForm.responseTone" placeholder="例如：温和、坚定、亲切" required></textarea>
               </div>
               <div class="form-group">
                 <label>产品知识水平：</label>
-                <input v-model="aiForm.productKnowledgeLevel" type="text" placeholder="例如：专家级、熟练、基础" required>
+                <textarea v-model="aiForm.productKnowledgeLevel" placeholder="例如：专家级、熟练、基础" required></textarea>
               </div>
             </div>
           </div>
@@ -137,11 +123,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>情商表现：</label>
-                <input v-model="aiForm.emotionalIntelligence" type="text" placeholder="例如：高情商，能够理解用户情绪" required>
+                <textarea v-model="aiForm.emotionalIntelligence" placeholder="例如：高情商，能够理解用户情绪" required></textarea>
               </div>
               <div class="form-group">
                 <label>升级处理标准：</label>
-                <input v-model="aiForm.escalationCriteria" type="text" placeholder="例如：用户情绪激动、技术问题复杂" required>
+                <textarea v-model="aiForm.escalationCriteria" placeholder="例如：用户情绪激动、技术问题复杂" required></textarea>
               </div>
             </div>
           </div>
@@ -168,7 +154,7 @@
             </div>
             <div class="form-group">
               <label>问候语：</label>
-              <input v-model="editForm.greetingMessage" type="text" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required>
+              <textarea v-model="editForm.greetingMessage" placeholder="例如：您好！我是您的专属客服助手，请问有什么可以帮助您的？" required></textarea>
             </div>
             <div class="form-group">
               <label>角色描述：</label>
@@ -176,7 +162,7 @@
             </div>
             <div class="form-group">
               <label>结束语：</label>
-              <input v-model="editForm.closingMessage" type="text" placeholder="例如：感谢您的咨询，祝您购物愉快！" required>
+              <textarea v-model="editForm.closingMessage" placeholder="例如：感谢您的咨询，祝您购物愉快！" required></textarea>
             </div>
           </div>
 
@@ -186,11 +172,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>解决问题的方法：</label>
-                <input v-model="editForm.problemSolvingApproach" type="text" placeholder="例如：耐心倾听，快速响应，提供解决方案" required>
+                <textarea v-model="editForm.problemSolvingApproach" placeholder="例如：耐心倾听，快速响应，提供解决方案" required></textarea>
               </div>
               <div class="form-group">
                 <label>沟通风格：</label>
-                <input v-model="editForm.communicationStyle" type="text" placeholder="例如：友好、专业、耐心" required>
+                <textarea v-model="editForm.communicationStyle" placeholder="例如：友好、专业、耐心" required></textarea>
               </div>
             </div>
           </div>
@@ -201,11 +187,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>回复语调：</label>
-                <input v-model="editForm.responseTone" type="text" placeholder="例如：温和、坚定、亲切" required>
+                <textarea v-model="editForm.responseTone" placeholder="例如：温和、坚定、亲切" required></textarea>
               </div>
               <div class="form-group">
                 <label>产品知识水平：</label>
-                <input v-model="editForm.productKnowledgeLevel" type="text" placeholder="例如：专家级、熟练、基础" required>
+                <textarea v-model="editForm.productKnowledgeLevel" placeholder="例如：专家级、熟练、基础" required></textarea>
               </div>
             </div>
           </div>
@@ -216,11 +202,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>情商表现：</label>
-                <input v-model="editForm.emotionalIntelligence" type="text" placeholder="例如：高情商，能够理解用户情绪" required>
+                <textarea v-model="editForm.emotionalIntelligence" placeholder="例如：高情商，能够理解用户情绪" required></textarea>
               </div>
               <div class="form-group">
                 <label>升级处理标准：</label>
-                <input v-model="editForm.escalationCriteria" type="text" placeholder="例如：用户情绪激动、技术问题复杂" required>
+                <textarea v-model="editForm.escalationCriteria" placeholder="例如：用户情绪激动、技术问题复杂" required></textarea>
               </div>
             </div>
           </div>
@@ -480,29 +466,7 @@ onMounted(() => {
   line-height: 1.5;
 }
 
-.ai-prompt-preview {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
-.ai-prompt-preview h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  color: #333;
-}
-
-.prompt-content {
-  background-color: #f8f9fa;
-  padding: 16px;
-  border-radius: 4px;
-  border-left: 4px solid #409eff;
-  white-space: pre-line;
-  font-family: monospace;
-  font-size: 14px;
-  line-height: 1.6;
-}
 
 .modal-overlay {
   position: fixed;

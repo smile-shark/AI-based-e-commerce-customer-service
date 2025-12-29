@@ -26,14 +26,14 @@ export interface ApiResponse<T = any> {
   data: T
 }
 
-// 标记用户消息为已读
-export const readUserMessage = (sessionId: number, userId: number): Promise<ApiResponse> => {
-  return api.put(`/sessionLog/readUserMessage?sessionId=${sessionId}&userId=${userId}`)
+// 用户阅读商户的消息（用户端使用）
+export const readCtMessage = (sessionId: number, userId: number): Promise<ApiResponse> => {
+  return api.put(`/sessionLog/readCtMessage?sessionId=${sessionId}&userId=${userId}`)
 }
 
-// 标记商户消息为已读
-export const readCtMessage = (sessionId: number, ctId: number): Promise<ApiResponse> => {
-  return api.put(`/sessionLog/readCtMessage?sessionId=${sessionId}&ctId=${ctId}`)
+// 商户阅读用户的消息（商户端使用）
+export const readUserMessage = (sessionId: number, ctId: number): Promise<ApiResponse> => {
+  return api.put(`/sessionLog/readUserMessage?sessionId=${sessionId}&ctId=${ctId}`)
 }
 
 // 获取会话窗口消息

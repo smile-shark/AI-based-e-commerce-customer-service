@@ -47,6 +47,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (!removeById(id)) {
             return Result.error(ResultCode.DELETE_ERROR);
         }
+        stringRedisTemplate.delete(KeyUtils.redisKeyUtils(key, id));
         return Result.success(ResultCode.DELETE_SUCCESS);
     }
 
@@ -55,6 +56,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (!updateById(role)) {
             return Result.error(ResultCode.UPDATE_ERROR);
         }
+        stringRedisTemplate.delete(KeyUtils.redisKeyUtils(key, role.getCtId()));
         return Result.success(ResultCode.UPDATE_SUCCESS);
     }
 

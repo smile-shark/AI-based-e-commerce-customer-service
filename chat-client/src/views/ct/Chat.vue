@@ -125,7 +125,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCtSessionList } from '@/api/sessionApi'
-import { getWindowMessage, readCtMessage } from '@/api/sessionLogApi'
+import { getWindowMessage, readUserMessage } from '@/api/sessionLogApi'
 import { getCtWebSocketClient } from '@/utils/websocket'
 import type { SessionItem } from '@/api/sessionApi'
 import type { MessageItem } from '@/api/sessionLogApi'
@@ -237,7 +237,7 @@ const markAsRead = async (sessionId: number) => {
     const ctId = localStorage.getItem('ctId')
     if (!ctId) return
 
-    await readCtMessage(sessionId, parseInt(ctId))
+    await readUserMessage(sessionId, parseInt(ctId))
     unreadCounts.value[sessionId] = 0
   } catch (error) {
     console.error('Failed to mark as read:', error)
@@ -703,7 +703,7 @@ onUnmounted(() => {
 
 .messages {
   flex: 1;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 300px);
   padding: 16px;
   overflow-y: auto;
   background: #f8f9fa;

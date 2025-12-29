@@ -1,12 +1,15 @@
 package com.smileshark.ai.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.smileshark.ai.adviser.CustomizationMemoryAdviser;
 import com.smileshark.ai.service.AIService;
 import com.smileshark.entity.Role;
 import com.smileshark.entity.Session;
 import com.smileshark.entity.SessionLog;
+import com.smileshark.mapper.SessionMapper;
 import com.smileshark.service.RoleService;
+import com.smileshark.utils.KeyUtils;
 import com.smileshark.websocket.endpoint.UserServiceEndpoint;
 import com.smileshark.websocket.message.ChatMessage;
 import jakarta.websocket.EncodeException;
@@ -24,12 +27,15 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.smileshark.code.DocumentCode.GOODS_ID;
 
@@ -41,12 +47,23 @@ public class AIServiceImpl implements AIService {
     private final CustomizationMemoryAdviser memoryAdviser;
     private final DashScopeChatModel dashscopeChatModel;
     private final VectorStore vectorStore;
+    private final SessionMapper sessionMapper;
+    private final StringRedisTemplate stringRedisTemplate;
     @Value("classpath:template/convert-to-manual-judgment-prompts.st")
     private Resource convertToManualJudgmentPromptsResource;
     @Value("classpath:template/customer-service-role.st")
     private Resource customerServiceRoleResource;
+    @Value("classpath:template/query-optimization.st")
+    private Resource queryOptimizationResource;
+    @Value("classpath:template/relevant-information-cannot-be-retrieved.st")
+    private Resource relevantInformationCannotBeRetrievedResource;
+    @Value("${session.key}")
+    private String sessionKey;
+    @Value("${session.expiration-duration}")
+    private Integer sessionTimeout;
 
     @Override
+    @Transactional
     public void turnToManualJudgment(Session chatSession, ChatMessage message) {
         // 添加转人工判断逻辑
         String result = chatClient.prompt()
@@ -62,6 +79,13 @@ public class AIServiceImpl implements AIService {
         }
         if (needTransfer) {
             chatSession.setConversationStatus(Session.ConversationStatus.HUMAN);
+            // 将转人工后的数据保存到数据库和redis中
+            sessionMapper.updateById(chatSession);
+            stringRedisTemplate.opsForValue().set(
+                    KeyUtils.redisKeyUtils(sessionKey, chatSession.getId()),
+                    JSONUtil.toJsonStr(chatSession),
+                    sessionTimeout, TimeUnit.MINUTES
+            );
         }
     }
 
@@ -125,7 +149,7 @@ public class AIServiceImpl implements AIService {
                                                 .allowEmptyContext(false)
                                                 .emptyContextPromptTemplate(
                                                         PromptTemplate.builder()
-                                                                .template("用户查询的位于知识库之外，礼貌的告知用户无法回答")
+                                                                .resource(relevantInformationCannotBeRetrievedResource)
                                                                 .build()
                                                 )
                                                 .build()
@@ -138,12 +162,7 @@ public class AIServiceImpl implements AIService {
                                                 .promptTemplate(
                                                         // 这里如果不设置自定义的模板，那么就会使用默认的模板，模板中要求 target,query 两个参数，所以必须查询
                                                         PromptTemplate.builder()
-                                                                .template("""
-                                                                        你是一个{target}的搜索查询专家。
-                                                                        请将用户的模糊查询重写为一个清晰、简洁、独立的搜索查询，只输出重写后的查询，不要添加任何解释。
-                                                                        用户查询：{query}
-                                                                        重写后的搜索查询：
-                                                                        """)
+                                                                .resource(queryOptimizationResource)
                                                                 .build()
                                                 )
                                                 .build()

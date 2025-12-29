@@ -117,6 +117,9 @@ const unreadCounts = ref<Record<number, number>>({})
 // AI流式消息累积
 const aiStreamingMessage = ref<MessageItem | null>(null)
 
+// AI回复超时定时器
+let aiReplyTimeout: ReturnType<typeof setTimeout> | null = null
+
 // WebSocket客户端
 let wsClient: any = null
 
@@ -256,6 +259,18 @@ const sendMessage = () => {
   }
   messages.value.push(tempMessage)
 
+  // 清除之前的超时定时器
+  if (aiReplyTimeout) {
+    clearTimeout(aiReplyTimeout)
+  }
+
+  // 设置AI回复超时保护（30秒后自动启用输入框）
+  aiReplyTimeout = setTimeout(() => {
+    console.log('AI reply timeout, enabling input')
+    isTyping.value = false
+    aiStreamingMessage.value = null
+  }, 30000)
+
   // 滚动到底部
   nextTick(() => {
     scrollToBottom()
@@ -295,14 +310,20 @@ const handleMessage = (message: WebSocketMessage) => {
   }
 
   // 处理END状态：AI流式输出完成
-  if (message.state === 'END' && message.sessionId === selectedSession.value?.id) {
-    console.log('AI streaming completed')
+  if (message.state === 'END') {
+    console.log('AI streaming completed, received END state')
 
     // 停止打字效果
     isTyping.value = false
 
     // 清除流式消息累积
     aiStreamingMessage.value = null
+
+    // 清除超时定时器
+    if (aiReplyTimeout) {
+      clearTimeout(aiReplyTimeout)
+      aiReplyTimeout = null
+    }
 
     // 滚动到底部
     nextTick(() => {
@@ -686,13 +707,15 @@ onUnmounted(() => {
 }
 
 .own-message .message-content {
-  background: #007bff;
-  color: white;
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  color: #333;
 }
 
 .ai-message .message-content {
-  background: #17a2b8;
-  color: white;
+  background: #e8f5e8;
+  border: 1px solid #c8e6c9;
+  color: #333;
 }
 
 .system-message .message-content {

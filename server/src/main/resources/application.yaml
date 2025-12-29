@@ -41,13 +41,13 @@ spring:
         # cosine: 余弦相似度，适合文本相似度计算
         metric-type: cosine
         initialize-schema: true  # 是否自动创建 schema
-session:
+session: # 会话的redis设置
   key: session
   expiration-duration: 10 # min
-role:
+role: # 角色的redis设置
   key: role
   expiration-duration: 10 # min
-memory:
+memory: # 记忆的redis设置
   expiration-duration: 10 # min
   key: memory
   redis-length: 10

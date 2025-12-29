@@ -45,7 +45,6 @@ public class FileToDocuments {
 
     private static class MarkdownFileHandler implements FileHandler {
         @Override
-
         public List<Document> run(MultipartFile file) {
             // 使用Spring AI的MarkdownDocumentReader设置分割的规则
             MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()

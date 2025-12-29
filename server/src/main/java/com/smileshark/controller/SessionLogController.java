@@ -15,7 +15,7 @@ public class SessionLogController {
     private final SessionLogService sessionLogService;
 
     /**
-     * 修改消息的状态为已读
+     * 用户阅读商户的消息，修改为已读状态
      * @param sessionId 会话id
      * @param userId 用户id
      * @return 修改结果
@@ -25,6 +25,12 @@ public class SessionLogController {
         return sessionLogService.readCtMessage(sessionId, userId);
     }
 
+    /**
+     * 商户阅读用户的消息，修改为已读状态
+     * @param sessionId 会话id
+     * @param ctId 商户id
+     * @return 修改结果
+     */
     @PutMapping("/readUserMessage")
     public Result<?> readUserMessage(@RequestParam("sessionId") Integer sessionId, @RequestParam("ctId") Integer ctId) {
         return sessionLogService.readUserMessage(sessionId, ctId);
@@ -47,8 +53,9 @@ public class SessionLogController {
      */
     @GetMapping("/userGetUnreadMessageCount")
     public Result<Integer> userGetUnreadMessageCount(@RequestParam("sessionId") Integer sessionId) {
-        return  sessionLogService.userGetUnreadMessageCount(sessionId);
+        return sessionLogService.userGetUnreadMessageCount(sessionId);
     }
+
     /**
      * 商户获取该session的未读消息数量
      * @param sessionId  会话id
@@ -56,6 +63,6 @@ public class SessionLogController {
      */
     @GetMapping("/ctGetUnreadMessageCount")
     public Result<Integer> ctGetUnreadMessageCount(@RequestParam("sessionId") Integer sessionId) {
-        return  sessionLogService.ctGetUnreadMessageCount(sessionId);
+        return sessionLogService.ctGetUnreadMessageCount(sessionId);
     }
 }
