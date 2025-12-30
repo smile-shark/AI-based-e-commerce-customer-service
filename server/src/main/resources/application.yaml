@@ -51,3 +51,6 @@ memory: # 记忆的redis设置
   expiration-duration: 10 # min
   key: memory
   redis-length: 10
+retrieval:
+  threshold: 0.3
+  number: 5

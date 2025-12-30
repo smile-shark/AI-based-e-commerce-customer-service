@@ -83,7 +83,10 @@
                 {{ getMessageAvatar(message.type) }}
               </div>
               <div class="message-content">
-                <div class="message-text">{{ message.content }}</div>
+                <div
+                  class="message-text"
+                  v-html="message.type === 'ASSISTANT' ? renderMarkdown(message.content) : message.content"
+                ></div>
                 <div class="message-time">{{ formatTime(message.timestamp) }}</div>
               </div>
               <div class="message-avatar own-avatar" v-if="message.type === 'COMMERCIAL_TENANT'">
@@ -127,6 +130,7 @@ import { useRouter } from 'vue-router'
 import { getCtSessionList } from '@/api/sessionApi'
 import { getWindowMessage, readUserMessage } from '@/api/sessionLogApi'
 import { getCtWebSocketClient } from '@/utils/websocket'
+import { marked } from 'marked'
 import type { SessionItem } from '@/api/sessionApi'
 import type { MessageItem } from '@/api/sessionLogApi'
 import type { ChatMessage, WebSocketMessage } from '@/utils/websocket'
@@ -166,6 +170,18 @@ const getMessageAvatar = (type: string) => {
     case 'SYSTEM': return '系'
     default: return '?'
   }
+}
+
+// 渲染Markdown内容
+const renderMarkdown = (content: string) => {
+  // 配置marked选项
+  marked.setOptions({
+    breaks: true, // 支持换行
+    gfm: true, // 支持GitHub风格的Markdown
+  })
+
+  // 渲染Markdown为HTML
+  return marked.parse(content)
 }
 
 // 格式化时间
@@ -856,6 +872,102 @@ onUnmounted(() => {
 
 .take-over-btn:hover:not(:disabled) {
   box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* Markdown 样式 */
+.message-text :deep(h1), .message-text :deep(h2), .message-text :deep(h3) {
+  margin: 8px 0 4px 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.message-text :deep(h1) { font-size: 18px; }
+.message-text :deep(h2) { font-size: 16px; }
+.message-text :deep(h3) { font-size: 14px; }
+
+.message-text :deep(p) {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.message-text :deep(ul), .message-text :deep(ol) {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message-text :deep(li) {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.message-text :deep(code) {
+  background: #f6f8fa;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  color: #d73a49;
+}
+
+.message-text :deep(pre) {
+  background: #f6f8fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.message-text :deep(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.message-text :deep(blockquote) {
+  border-left: 4px solid #ddd;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #666;
+  font-style: italic;
+}
+
+.message-text :deep(a) {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.message-text :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.message-text :deep(strong), .message-text :deep(b) {
+  font-weight: 600;
+  color: #333;
+}
+
+.message-text :deep(em), .message-text :deep(i) {
+  font-style: italic;
+  color: #666;
+}
+
+.message-text :deep(table) {
+  border-collapse: collapse;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.message-text :deep(th), .message-text :deep(td) {
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.message-text :deep(th) {
+  background: #f6f8fa;
+  font-weight: 600;
 }
 
 /* 空状态样式 */

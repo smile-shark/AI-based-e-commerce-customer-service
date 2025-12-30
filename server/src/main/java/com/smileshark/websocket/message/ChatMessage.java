@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ChatMessage {
+    
     private Integer sessionId;
     private Integer goodsId;
     private Integer ctId;

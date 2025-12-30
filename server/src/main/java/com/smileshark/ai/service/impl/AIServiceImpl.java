@@ -61,6 +61,10 @@ public class AIServiceImpl implements AIService {
     private String sessionKey;
     @Value("${session.expiration-duration}")
     private Integer sessionTimeout;
+    @Value("${retrieval.threshold}")
+    private Double retrievalThreshold;
+    @Value("${retrieval.number}")
+    private Integer retrievalNumber;
 
     @Override
     @Transactional
@@ -126,10 +130,10 @@ public class AIServiceImpl implements AIService {
                                 // 配置文档检索器
                                 .documentRetriever(
                                         VectorStoreDocumentRetriever.builder()
-                                                // 设置相似度阈值 大于0.5的才选用
-                                                .similarityThreshold(.5)
-                                                // 只选取最高的5条，减少token的使用
-                                                .topK(5)
+                                                // 设置相似度阈值 大于则这个值的才选用
+                                                .similarityThreshold(retrievalThreshold)
+                                                // 只选取最高的指定条，减少token的使用
+                                                .topK(retrievalNumber)
                                                 // 配置过滤器，只选取商品ID为当前商品的数据
                                                 .filterExpression(
                                                         new Filter.Expression(

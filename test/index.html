@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 电商客服流程图编辑器 (成本优化版)</title>
+    <title>传统客服 vs AI客服流程对比 (高清修复版)</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
@@ -34,8 +34,8 @@
 <!-- 头部 -->
 <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm z-20">
     <div class="flex items-center gap-4">
-        <h1 class="text-xl font-bold text-gray-800">AI 电商客服流程图编辑器</h1>
-        <span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">成本优化：先判状态，再拉记忆</span>
+        <h1 class="text-xl font-bold text-gray-800">客服模式深度对比预览</h1>
+        <span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">左：传统模式 | 右：AI模式</span>
     </div>
     <div class="space-x-2 flex items-center">
         <button id="resetZoomBtn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-lg text-sm transition">
@@ -47,7 +47,7 @@
 
         <div class="relative inline-block dropdown">
             <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition text-sm font-medium inline-flex items-center">
-                <span>导出图片</span>
+                <span>导出高清图片</span>
                 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
             <div class="dropdown-menu absolute right-0 hidden pt-2 w-32 z-30">
@@ -67,71 +67,69 @@
 <!-- 主体 -->
 <main class="flex-1 flex overflow-hidden p-4 gap-4">
     <!-- 编辑区 -->
-    <div class="w-1/3 flex flex-col bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div class="w-1/4 flex flex-col bg-white rounded-xl shadow-sm border overflow-hidden">
         <div class="bg-gray-50 px-4 py-2 border-b text-sm font-medium text-gray-500 flex justify-between">
-            <span>Mermaid 源码编辑器</span>
+            <span>Mermaid 源码</span>
         </div>
-        <textarea id="editor" class="flex-1 p-4 outline-none text-sm leading-relaxed text-gray-700">graph TD
+        <textarea id="editor" class="flex-1 p-4 outline-none text-sm leading-relaxed text-gray-700">graph LR
+    %% 使用 LR (Left to Right) 确保两个大的 Subgraph 横向排列，内部逻辑 TB (Top Bottom)
+
     %% 样式定义
-    classDef merchant fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef customer fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
-    classDef ai_logic fill:#fff3e0,stroke:#e65100,stroke-width:2px,stroke-dasharray: 5 5;
-    classDef database fill:#f1f8e9,stroke:#33691e,stroke-width:2px;
+    classDef bad_node fill:#ffebee,stroke:#c62828,stroke-width:2px;
+    classDef good_node fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef neutral_node fill:#f5f5f5,stroke:#9e9e9e,stroke-width:1px;
+    classDef highlight_node fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
 
-    subgraph Merchant_Section [商户管理端]
-        M1[添加商品] --> M2[上传商品描述/政策文档]
-        M2 --> M3{RAG 预处理}
-        M3 -->|拆分/向量化| M4[(向量数据库)]
-        M5[配置 AI 客服设置] -->|角色/语调/问候语| M6[(MySQL: 客服配置表)]
+    subgraph TRADITIONAL [1. 传统人工客服流程 - 痛点明显]
+        direction TB
+        T1[用户咨询] --> T2{排队等待}
+        T2 -->|峰值时段| T3[漫长排队/用户流失]:::bad_node
+        T2 -->|介入| T4[人工接待]
+        T4 --> T5{简单重复问题?}
+        T5 -->|是| T6[人工重复解答]:::bad_node
+        T5 -->|否| T7[复杂问题沟通]
+        T7 --> T8[商户反复查阅文档]:::bad_node
+        T8 --> T9[回复延迟]:::bad_node
+        T9 --> T10[人工手动记录/整理]:::bad_node
+
+        T6 --> T11[人力成本高/效率低]:::bad_node
+        T10 --> T11
     end
 
-    subgraph Customer_Section [用户客户端]
-        C1[浏览商品列表] --> C2[点击商品进入聊天]
-        C2 --> C3[发送消息]
-        C3 --> C4[后端获取会话 Session]
+    %% 占位符确保间距
+    TRADITIONAL --- SPACE((对比)) --- AI_POWERED
 
-        C4 --> C5{查询商户配置}
-        C5 -->|未配置 AI| S_Human[进入人工模式]
-        C5 -->|已配置 AI| A0[敏感词 & 情绪预检]
+    subgraph AI_POWERED [2. AI 智能客服流程 - 降本增效]
+        direction TB
+        A1[用户咨询] --> A2{AI 预检}
+        A2 -->|秒级响应| A3{分流策略}:::good_node
 
-        %% 第一层：安全与分流判断（零 Token 消耗点）
-        A0 -->|检测异常| ChangeToHuman[修改 Session 为 HUMAN]
-        ChangeToHuman --> S_Human
-        A0 -->|检测正常| A1{查询会话当前状态}
+        A3 -->|简单/常见| A4[AI 基于RAG精准秒回]:::good_node
+        A3 -->|复杂/转人工| A5[无缝介入人工]
 
-        A1 -->|Status: HUMAN| S_Human
+        A4 --> A6[24/7 全天候在线]:::good_node
+        A4 --> A7[自动更新记忆/知识库]:::good_node
 
-        %% 第二层：AI 核心链路（按需加载资源）
-        A1 -->|Status: AI| A2[从 Redis 获取近期记忆 - Top 10]
+        A5 --> A8[AI 辅助查阅/建议回复]:::highlight_node
+        A8 --> A9[人工仅需审核点击]:::good_node
 
-        A2 --> A3[RAG: 检索向量数据库相关文档]
-        A3 --> A4[LLM 生成回答 - 注入记忆与文档]
-
-        A4 --> A5{LLM 逻辑判断}
-        A5 -->|判定需转人工| ChangeToHuman
-        A5 -->|确认 AI 回答| A6[更新 Redis 短期记忆]
-
-        A6 --> A7[同步至 MySQL 长期记忆]
-        A7 --> A8[返回响应给客户]
-
-        %% 人工模式流程
-        S_Human --> H1[消息同步写入 MySQL]
-        H1 --> H2{商户状态?}
-        H2 -->|在线| H3[WebSocket 推送商户]
-        H2 -->|离线| H4[转为留言工单]
-        H3 --> H5[商户/客户双向实时聊天]
+        A7 --> A10[极低边际成本/高并发]:::good_node
+        A9 --> A10
     end
 
-    %% 关系标注
-    class M1,M2,M3,M5 merchant;
-    class C1,C2,C3,C4 customer;
-    class A0,A2,A3,A4,A5 ai_logic;
-    class M4,M6,H1,A7 database;</textarea>
+    %% 标注
+    class T3,T6,T8,T9,T10,T11 bad_node;
+    class A3,A4,A6,A7,A9,A10 good_node;
+    class A8 highlight_node;
+    style SPACE fill:none,stroke:none,color:#999;</textarea>
     </div>
 
     <!-- 预览区 -->
     <div class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border overflow-hidden relative">
-        <div class="bg-gray-50 px-4 py-2 border-b text-sm font-medium text-gray-500">可视化预览 (优化后的逻辑链路)</div>
+        <div class="bg-gray-50 px-4 py-2 border-b text-sm font-medium text-gray-500 flex justify-between items-center">
+            <span>可视化对比预览 (左：传统 / 右：AI)</span>
+            <span class="text-xs text-gray-400">红色为痛点，绿色为优势</span>
+        </div>
         <div id="preview" class="flex-1 mermaid-container">
             <div id="graphContainer" class="w-full h-full flex items-center justify-center">
             </div>
@@ -187,13 +185,18 @@
         const svgElement = container.querySelector('svg');
         if (!svgElement) return;
 
+        // 1. 获取准确的视图框和尺寸
+        // 使用 getBBox 获取 SVG 内容的实际边界
         const bbox = svgElement.getBBox();
-        const width = bbox.width + 40;
-        const height = bbox.height + 40;
+        const padding = 60; // 边缘留白
+        const width = bbox.width + padding * 2;
+        const height = bbox.height + padding * 2;
 
+        // 2. 深度克隆并处理 SVG 源码
         const serializer = new XMLSerializer();
         let source = serializer.serializeToString(svgElement);
 
+        // 确保命名空间完整
         if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
             source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
         }
@@ -201,6 +204,7 @@
             source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
         }
 
+        // 3. 转换
         const svgBase64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(source)));
         const img = new Image();
         img.crossOrigin = "anonymous";
@@ -208,19 +212,28 @@
         img.onload = function() {
             try {
                 const canvas = document.createElement('canvas');
-                const scale = 2;
+                const scale = 4; // 提升至 4 倍高清渲染
                 canvas.width = width * scale;
                 canvas.height = height * scale;
                 const ctx = canvas.getContext('2d');
+
+                // 启用平滑绘制
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // 绘制白色背景
                 ctx.fillStyle = "white";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // 核心修复：根据 BBox 的位置进行偏移，防止图片被切掉
                 ctx.scale(scale, scale);
-                ctx.drawImage(img, 20 - bbox.x, 20 - bbox.y);
+                ctx.drawImage(img, padding - bbox.x, padding - bbox.y);
 
                 const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-                const dataUrl = canvas.toDataURL(mimeType, 0.9);
+                const dataUrl = canvas.toDataURL(mimeType, 0.95); // 调高 JPG 质量
+
                 const link = document.createElement('a');
-                link.download = `AI电商客服流程图_成本优化版.${format}`;
+                link.download = `客服模式对比高清图_${new Date().getTime()}.${format}`;
                 link.href = dataUrl;
                 document.body.appendChild(link);
                 link.click();
@@ -251,11 +264,7 @@
 
         const originalText = downloadBtn.innerText;
         downloadBtn.innerText = '已复制!';
-        downloadBtn.classList.replace('bg-gray-600', 'bg-green-600');
-        setTimeout(() => {
-            downloadBtn.innerText = originalText;
-            downloadBtn.classList.replace('bg-green-600', 'bg-gray-600');
-        }, 2000);
+        setTimeout(() => downloadBtn.innerText = originalText, 2000);
     });
 
     window.onload = renderGraph;
